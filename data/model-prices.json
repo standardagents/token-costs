@@ -1,0 +1,642 @@
+{
+  "meta": {
+    "title": "Major AI lab API token prices over time",
+    "asOf": "2026-05-07",
+    "currency": "USD",
+    "unit": "per 1M tokens",
+    "defaultMetric": "outputUsdPer1M",
+    "basis": "Standard first-party API text token rates at or near public API release. Excludes cached input, batch, flex, priority, regional uplifts, tool calls, search/grounding, image/audio/video, provisioned throughput, and enterprise discounts.",
+    "tieredPricingRule": "When a model has context-tiered pricing, this dataset uses the lower-context standard text price so series are comparable.",
+    "scope": "Major public API text/chat model lines from OpenAI, Anthropic, and Google. It is not a complete catalog of every snapshot, preview alias, modality model, or partner-platform variant."
+  },
+  "labs": [
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "brandColor": "#111827",
+      "logo": "assets/logos/openai.svg"
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic",
+      "brandColor": "#d97757",
+      "logo": "assets/logos/anthropic.svg"
+    },
+    {
+      "id": "google",
+      "name": "Google",
+      "brandColor": "#4285f4",
+      "logo": "assets/logos/google.svg"
+    }
+  ],
+  "series": [
+    {
+      "id": "openai-gpt-frontier",
+      "lab": "openai",
+      "name": "GPT flagship",
+      "color": "#111827",
+      "dash": [],
+      "cohort": "frontier"
+    },
+    {
+      "id": "openai-gpt-mini",
+      "lab": "openai",
+      "name": "GPT mini",
+      "cohort": "mini",
+      "color": "#6b7280",
+      "dash": [
+        7,
+        5
+      ]
+    },
+    {
+      "id": "openai-gpt-nano",
+      "lab": "openai",
+      "name": "GPT nano",
+      "cohort": "nano",
+      "color": "#9ca3af",
+      "dash": [
+        2,
+        5
+      ]
+    },
+    {
+      "id": "anthropic-opus",
+      "lab": "anthropic",
+      "name": "Claude Opus/frontier",
+      "color": "#b4532f",
+      "dash": [],
+      "cohort": "frontier"
+    },
+    {
+      "id": "anthropic-sonnet",
+      "lab": "anthropic",
+      "name": "Claude Sonnet",
+      "color": "#d97757",
+      "dash": [
+        8,
+        4
+      ],
+      "cohort": "mini"
+    },
+    {
+      "id": "anthropic-haiku",
+      "lab": "anthropic",
+      "name": "Claude Haiku",
+      "color": "#f0a66a",
+      "dash": [
+        2,
+        5
+      ],
+      "cohort": "nano"
+    },
+    {
+      "id": "google-pro",
+      "lab": "google",
+      "name": "Gemini Pro",
+      "color": "#1a73e8",
+      "dash": [],
+      "cohort": "frontier"
+    },
+    {
+      "id": "google-flash",
+      "lab": "google",
+      "name": "Gemini Flash",
+      "color": "#4285f4",
+      "dash": [
+        8,
+        4
+      ],
+      "cohort": "mini"
+    },
+    {
+      "id": "google-flash-lite",
+      "lab": "google",
+      "name": "Gemini Flash-Lite",
+      "color": "#8ab4f8",
+      "dash": [
+        2,
+        5
+      ],
+      "cohort": "nano"
+    }
+  ],
+  "sources": {
+    "openai-chatgpt-whisper": "https://openai.com/index/introducing-chatgpt-and-whisper-apis/",
+    "openai-gpt4": "https://openai.com/index/gpt-4-research/",
+    "openai-devday-2023": "https://openai.com/index/new-models-and-developer-products-announced-at-devday/",
+    "openai-api-updates-2024-01": "https://openai.com/index/new-embedding-models-and-api-updates/",
+    "openai-gpt4o": "https://openai.com/index/hello-gpt-4o/",
+    "openai-gpt4o-mini": "https://openai.com/index/gpt-4o-mini-advancing-cost-efficient-intelligence/",
+    "openai-gpt45": "https://openai.com/index/introducing-gpt-4-5/",
+    "openai-gpt45-doc": "https://platform.openai.com/docs/models/gpt-4.5-preview",
+    "openai-gpt41": "https://openai.com/index/gpt-4-1/",
+    "openai-gpt5-dev": "https://openai.com/index/introducing-gpt-5-for-developers",
+    "openai-gpt54": "https://openai.com/index/introducing-gpt-5-4/",
+    "openai-gpt54-mini": "https://openai.com/index/introducing-gpt-5-4-mini-and-nano/",
+    "openai-gpt55": "https://openai.com/index/introducing-gpt-5-5/",
+    "openai-pricing": "https://openai.com/api/pricing/",
+    "anthropic-claude2": "https://www.anthropic.com/news/claude-2",
+    "anthropic-pricing-pdf": "https://www-cdn.anthropic.com/files/4zrzovbb/website/90df03aed08b794ab03c5a7bf28b2ad9cf26cf3c.pdf",
+    "anthropic-claude3": "https://www.anthropic.com/news/claude-3-family",
+    "anthropic-35-sonnet": "https://www.anthropic.com/news/claude-3-5-sonnet",
+    "anthropic-35-models": "https://www.anthropic.com/news/3-5-models-and-computer-use",
+    "anthropic-37-sonnet": "https://www.anthropic.com/news/claude-3-7-sonnet",
+    "anthropic-claude4": "https://www.anthropic.com/news/claude-4",
+    "anthropic-opus41": "https://www.anthropic.com/news/claude-opus-4-1",
+    "anthropic-sonnet45": "https://www.anthropic.com/news/claude-sonnet-4-5",
+    "anthropic-haiku45": "https://www.anthropic.com/news/claude-haiku-4-5",
+    "anthropic-opus45": "https://www.anthropic.com/news/claude-opus-4-5",
+    "anthropic-opus46": "https://www.anthropic.com/news/claude-opus-4-6",
+    "anthropic-sonnet46": "https://www.anthropic.com/claude/sonnet",
+    "anthropic-opus47": "https://www.anthropic.com/news/claude-opus-4-7",
+    "google-io-2024": "https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/",
+    "google-developer-may-2024": "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-gemma-developer-updates-may-2024/",
+    "google-gemini25": "https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/",
+    "google-gemini25-billing": "https://blog.google/products-and-platforms/products/gemini/gemini-preview-model-billing-update/",
+    "google-gemini25-family": "https://blog.google/products-and-platforms/products/gemini/gemini-2-5-model-family-expands/",
+    "google-gemini3": "https://blog.google/products-and-platforms/products/gemini/gemini-3/",
+    "google-gemini3-flash": "https://blog.google/products/gemini/gemini-3-flash/",
+    "google-gemini31-pro": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro",
+    "google-gemini31-flash-lite": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-lite",
+    "google-pricing": "https://ai.google.dev/gemini-api/docs/pricing"
+  },
+  "points": [
+    {
+      "date": "2023-03-14",
+      "lab": "openai",
+      "series": "openai-gpt-frontier",
+      "model": "gpt-4-0314",
+      "inputUsdPer1M": 30,
+      "outputUsdPer1M": 60,
+      "sourceIds": [
+        "openai-gpt4"
+      ],
+      "note": "Uses the 8K context GPT-4 launch price."
+    },
+    {
+      "date": "2023-07-11",
+      "lab": "anthropic",
+      "series": "anthropic-opus",
+      "model": "Claude 2",
+      "inputUsdPer1M": 8,
+      "outputUsdPer1M": 24,
+      "sourceIds": [
+        "anthropic-claude2",
+        "anthropic-pricing-pdf"
+      ],
+      "note": "Claude 2 carried forward Claude 1.3 API pricing."
+    },
+    {
+      "date": "2024-03-04",
+      "lab": "anthropic",
+      "series": "anthropic-opus",
+      "model": "Claude 3 Opus",
+      "inputUsdPer1M": 15,
+      "outputUsdPer1M": 75,
+      "sourceIds": [
+        "anthropic-claude3"
+      ]
+    },
+    {
+      "date": "2024-03-04",
+      "lab": "anthropic",
+      "series": "anthropic-sonnet",
+      "model": "Claude 3 Sonnet",
+      "inputUsdPer1M": 3,
+      "outputUsdPer1M": 15,
+      "sourceIds": [
+        "anthropic-claude3"
+      ]
+    },
+    {
+      "date": "2024-03-04",
+      "lab": "anthropic",
+      "series": "anthropic-haiku",
+      "model": "Claude 3 Haiku",
+      "inputUsdPer1M": 0.25,
+      "outputUsdPer1M": 1.25,
+      "sourceIds": [
+        "anthropic-claude3"
+      ]
+    },
+    {
+      "date": "2024-05-13",
+      "lab": "openai",
+      "series": "openai-gpt-frontier",
+      "model": "gpt-4o",
+      "inputUsdPer1M": 5,
+      "outputUsdPer1M": 15,
+      "sourceIds": [
+        "openai-gpt4o"
+      ]
+    },
+    {
+      "date": "2024-05-14",
+      "lab": "google",
+      "series": "google-pro",
+      "model": "Gemini 1.5 Pro",
+      "inputUsdPer1M": 3.5,
+      "outputUsdPer1M": 10.5,
+      "sourceIds": [
+        "google-io-2024",
+        "google-developer-may-2024"
+      ],
+      "note": "Uses public-preview Gemini API token pricing at launch for contexts up to 128K."
+    },
+    {
+      "date": "2024-05-14",
+      "lab": "google",
+      "series": "google-flash",
+      "model": "Gemini 1.5 Flash",
+      "inputUsdPer1M": 0.35,
+      "outputUsdPer1M": 1.05,
+      "sourceIds": [
+        "google-io-2024",
+        "google-developer-may-2024"
+      ],
+      "note": "Uses public-preview Gemini API token pricing at launch for contexts up to 128K."
+    },
+    {
+      "date": "2024-06-21",
+      "lab": "anthropic",
+      "series": "anthropic-sonnet",
+      "model": "Claude 3.5 Sonnet",
+      "inputUsdPer1M": 3,
+      "outputUsdPer1M": 15,
+      "sourceIds": [
+        "anthropic-35-sonnet"
+      ]
+    },
+    {
+      "date": "2024-07-18",
+      "lab": "openai",
+      "series": "openai-gpt-mini",
+      "model": "gpt-4o-mini",
+      "inputUsdPer1M": 0.15,
+      "outputUsdPer1M": 0.6,
+      "sourceIds": [
+        "openai-gpt4o-mini"
+      ]
+    },
+    {
+      "date": "2024-09-24",
+      "lab": "google",
+      "series": "google-flash-lite",
+      "model": "Gemini 1.5 Flash-8B",
+      "inputUsdPer1M": 0.0375,
+      "outputUsdPer1M": 0.15,
+      "sourceIds": [
+        "google-pricing"
+      ],
+      "note": "Historical low-cost Flash-8B point; Google later consolidated Flash-Lite pricing around Gemini 2.x/2.5."
+    },
+    {
+      "date": "2024-10-22",
+      "lab": "anthropic",
+      "series": "anthropic-sonnet",
+      "model": "Claude 3.5 Sonnet v2",
+      "inputUsdPer1M": 3,
+      "outputUsdPer1M": 15,
+      "sourceIds": [
+        "anthropic-35-models"
+      ]
+    },
+    {
+      "date": "2024-11-04",
+      "lab": "anthropic",
+      "series": "anthropic-haiku",
+      "model": "Claude 3.5 Haiku",
+      "inputUsdPer1M": 1,
+      "outputUsdPer1M": 5,
+      "sourceIds": [
+        "anthropic-35-models"
+      ],
+      "note": "Launch price was reported as $1/$5; Anthropic revised the public price to $0.80/$4 on 2024-12-03."
+    },
+    {
+      "date": "2025-02-05",
+      "lab": "google",
+      "series": "google-flash",
+      "model": "Gemini 2.0 Flash",
+      "inputUsdPer1M": 0.1,
+      "outputUsdPer1M": 0.4,
+      "sourceIds": [
+        "google-pricing"
+      ]
+    },
+    {
+      "date": "2025-02-05",
+      "lab": "google",
+      "series": "google-flash-lite",
+      "model": "Gemini 2.0 Flash-Lite",
+      "inputUsdPer1M": 0.075,
+      "outputUsdPer1M": 0.3,
+      "sourceIds": [
+        "google-pricing"
+      ]
+    },
+    {
+      "date": "2025-02-24",
+      "lab": "anthropic",
+      "series": "anthropic-sonnet",
+      "model": "Claude 3.7 Sonnet",
+      "inputUsdPer1M": 3,
+      "outputUsdPer1M": 15,
+      "sourceIds": [
+        "anthropic-37-sonnet"
+      ]
+    },
+    {
+      "date": "2025-04-09",
+      "lab": "google",
+      "series": "google-pro",
+      "model": "Gemini 2.5 Pro Preview",
+      "inputUsdPer1M": 1.25,
+      "outputUsdPer1M": 10,
+      "sourceIds": [
+        "google-gemini25",
+        "google-gemini25-billing",
+        "google-pricing"
+      ],
+      "note": "Paid public preview price for prompts up to 200K tokens."
+    },
+    {
+      "date": "2025-04-14",
+      "lab": "openai",
+      "series": "openai-gpt-frontier",
+      "model": "gpt-4.1",
+      "inputUsdPer1M": 2,
+      "outputUsdPer1M": 8,
+      "sourceIds": [
+        "openai-gpt41",
+        "openai-pricing"
+      ]
+    },
+    {
+      "date": "2025-04-14",
+      "lab": "openai",
+      "series": "openai-gpt-mini",
+      "model": "gpt-4.1-mini",
+      "inputUsdPer1M": 0.4,
+      "outputUsdPer1M": 1.6,
+      "sourceIds": [
+        "openai-gpt41",
+        "openai-pricing"
+      ]
+    },
+    {
+      "date": "2025-04-14",
+      "lab": "openai",
+      "series": "openai-gpt-nano",
+      "model": "gpt-4.1-nano",
+      "inputUsdPer1M": 0.1,
+      "outputUsdPer1M": 0.4,
+      "sourceIds": [
+        "openai-gpt41",
+        "openai-pricing"
+      ]
+    },
+    {
+      "date": "2025-05-20",
+      "lab": "google",
+      "series": "google-flash",
+      "model": "Gemini 2.5 Flash",
+      "inputUsdPer1M": 0.3,
+      "outputUsdPer1M": 2.5,
+      "sourceIds": [
+        "google-gemini25-family",
+        "google-pricing"
+      ]
+    },
+    {
+      "date": "2025-05-22",
+      "lab": "anthropic",
+      "series": "anthropic-opus",
+      "model": "Claude Opus 4",
+      "inputUsdPer1M": 15,
+      "outputUsdPer1M": 75,
+      "sourceIds": [
+        "anthropic-claude4"
+      ]
+    },
+    {
+      "date": "2025-05-22",
+      "lab": "anthropic",
+      "series": "anthropic-sonnet",
+      "model": "Claude Sonnet 4",
+      "inputUsdPer1M": 3,
+      "outputUsdPer1M": 15,
+      "sourceIds": [
+        "anthropic-claude4"
+      ]
+    },
+    {
+      "date": "2025-06-17",
+      "lab": "google",
+      "series": "google-flash-lite",
+      "model": "Gemini 2.5 Flash-Lite",
+      "inputUsdPer1M": 0.1,
+      "outputUsdPer1M": 0.4,
+      "sourceIds": [
+        "google-gemini25-family",
+        "google-pricing"
+      ]
+    },
+    {
+      "date": "2025-08-05",
+      "lab": "anthropic",
+      "series": "anthropic-opus",
+      "model": "Claude Opus 4.1",
+      "inputUsdPer1M": 15,
+      "outputUsdPer1M": 75,
+      "sourceIds": [
+        "anthropic-opus41"
+      ]
+    },
+    {
+      "date": "2025-08-07",
+      "lab": "openai",
+      "series": "openai-gpt-frontier",
+      "model": "gpt-5",
+      "inputUsdPer1M": 1.25,
+      "outputUsdPer1M": 10,
+      "sourceIds": [
+        "openai-gpt5-dev"
+      ]
+    },
+    {
+      "date": "2025-08-07",
+      "lab": "openai",
+      "series": "openai-gpt-mini",
+      "model": "gpt-5-mini",
+      "inputUsdPer1M": 0.25,
+      "outputUsdPer1M": 2,
+      "sourceIds": [
+        "openai-gpt5-dev"
+      ]
+    },
+    {
+      "date": "2025-08-07",
+      "lab": "openai",
+      "series": "openai-gpt-nano",
+      "model": "gpt-5-nano",
+      "inputUsdPer1M": 0.05,
+      "outputUsdPer1M": 0.4,
+      "sourceIds": [
+        "openai-gpt5-dev"
+      ]
+    },
+    {
+      "date": "2025-09-29",
+      "lab": "anthropic",
+      "series": "anthropic-sonnet",
+      "model": "Claude Sonnet 4.5",
+      "inputUsdPer1M": 3,
+      "outputUsdPer1M": 15,
+      "sourceIds": [
+        "anthropic-sonnet45"
+      ]
+    },
+    {
+      "date": "2025-10-15",
+      "lab": "anthropic",
+      "series": "anthropic-haiku",
+      "model": "Claude Haiku 4.5",
+      "inputUsdPer1M": 1,
+      "outputUsdPer1M": 5,
+      "sourceIds": [
+        "anthropic-haiku45"
+      ]
+    },
+    {
+      "date": "2025-11-18",
+      "lab": "google",
+      "series": "google-pro",
+      "model": "Gemini 3 Pro",
+      "inputUsdPer1M": 2,
+      "outputUsdPer1M": 12,
+      "sourceIds": [
+        "google-gemini3",
+        "google-pricing"
+      ],
+      "note": "Uses the Gemini 3 Pro/3.1 Pro standard text tier shown on current Gemini API pricing."
+    },
+    {
+      "date": "2025-11-24",
+      "lab": "anthropic",
+      "series": "anthropic-opus",
+      "model": "Claude Opus 4.5",
+      "inputUsdPer1M": 5,
+      "outputUsdPer1M": 25,
+      "sourceIds": [
+        "anthropic-opus45"
+      ]
+    },
+    {
+      "date": "2025-12-17",
+      "lab": "google",
+      "series": "google-flash",
+      "model": "Gemini 3 Flash",
+      "inputUsdPer1M": 0.5,
+      "outputUsdPer1M": 3,
+      "sourceIds": [
+        "google-gemini3-flash",
+        "google-pricing"
+      ]
+    },
+    {
+      "date": "2026-02-05",
+      "lab": "anthropic",
+      "series": "anthropic-opus",
+      "model": "Claude Opus 4.6",
+      "inputUsdPer1M": 5,
+      "outputUsdPer1M": 25,
+      "sourceIds": [
+        "anthropic-opus46"
+      ]
+    },
+    {
+      "date": "2026-02-17",
+      "lab": "anthropic",
+      "series": "anthropic-sonnet",
+      "model": "Claude Sonnet 4.6",
+      "inputUsdPer1M": 3,
+      "outputUsdPer1M": 15,
+      "sourceIds": [
+        "anthropic-sonnet46"
+      ]
+    },
+    {
+      "date": "2026-02-19",
+      "lab": "google",
+      "series": "google-pro",
+      "model": "Gemini 3.1 Pro Preview",
+      "inputUsdPer1M": 2,
+      "outputUsdPer1M": 12,
+      "sourceIds": [
+        "google-gemini31-pro",
+        "google-pricing"
+      ]
+    },
+    {
+      "date": "2026-03-03",
+      "lab": "google",
+      "series": "google-flash-lite",
+      "model": "Gemini 3.1 Flash-Lite",
+      "inputUsdPer1M": 0.25,
+      "outputUsdPer1M": 1.5,
+      "sourceIds": [
+        "google-gemini31-flash-lite",
+        "google-pricing"
+      ]
+    },
+    {
+      "date": "2026-03-05",
+      "lab": "openai",
+      "series": "openai-gpt-frontier",
+      "model": "gpt-5.4",
+      "inputUsdPer1M": 2.5,
+      "outputUsdPer1M": 15,
+      "sourceIds": [
+        "openai-gpt54",
+        "openai-pricing"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "lab": "openai",
+      "series": "openai-gpt-mini",
+      "model": "gpt-5.4-mini",
+      "inputUsdPer1M": 0.75,
+      "outputUsdPer1M": 4.5,
+      "sourceIds": [
+        "openai-gpt54-mini",
+        "openai-pricing"
+      ]
+    },
+    {
+      "date": "2026-04-16",
+      "lab": "anthropic",
+      "series": "anthropic-opus",
+      "model": "Claude Opus 4.7",
+      "inputUsdPer1M": 5,
+      "outputUsdPer1M": 25,
+      "sourceIds": [
+        "anthropic-opus47"
+      ]
+    },
+    {
+      "date": "2026-04-24",
+      "lab": "openai",
+      "series": "openai-gpt-frontier",
+      "model": "gpt-5.5",
+      "inputUsdPer1M": 5,
+      "outputUsdPer1M": 30,
+      "sourceIds": [
+        "openai-gpt55",
+        "openai-pricing"
+      ]
+    }
+  ]
+}
