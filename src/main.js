@@ -12,12 +12,15 @@ const state = {
   controls: [],
   labToggles: [],
   cohortToggles: [],
+  filterButton: null,
+  filterPanel: null,
   enabledLabs: new Set(),
   enabledCohorts: new Set(),
   images: new Map(),
   startDateValue: null,
   endDateValue: null,
   draggingCursor: null,
+  filterPanelOpen: false,
   reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   animationStart: performance.now()
 };
@@ -54,6 +57,7 @@ Promise.all([
     resize();
     window.addEventListener("resize", resize);
     window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
     canvas.addEventListener("pointermove", onPointerMove);
     canvas.addEventListener("pointerdown", onPointerDown);
     canvas.addEventListener("pointerleave", onPointerLeave);
@@ -176,6 +180,7 @@ function resize() {
 }
 
 function onPointerMove(event) {
+  if (event.pointerType === "touch") event.preventDefault();
   const rect = canvas.getBoundingClientRect();
   state.pointer = {
     x: event.clientX - rect.left,
@@ -199,6 +204,7 @@ function onPointerLeave() {
 }
 
 function onPointerDown(event) {
+  if (event.pointerType === "touch") event.preventDefault();
   const rect = canvas.getBoundingClientRect();
   const pointer = {
     x: event.clientX - rect.left,
@@ -208,7 +214,9 @@ function onPointerDown(event) {
   const onControl = getControlAt(pointer.x, pointer.y);
   const onLabToggle = getLabToggleAt(pointer.x, pointer.y);
   const onCohortToggle = getCohortToggleAt(pointer.x, pointer.y);
-  if (onControl || onLabToggle || onCohortToggle) return;
+  const onFilterButton = getFilterButtonAt(pointer.x, pointer.y);
+  const onFilterPanel = getFilterPanelAt(pointer.x, pointer.y);
+  if (onControl || onLabToggle || onCohortToggle || onFilterButton || onFilterPanel) return;
 
   const cursor = getComparisonCursorAt(pointer);
   if (cursor) {
@@ -237,6 +245,15 @@ function onClick(event) {
   const rect = canvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
+  const filterButton = getFilterButtonAt(x, y);
+
+  if (filterButton) {
+    state.filterPanelOpen = !state.filterPanelOpen;
+    state.hover = null;
+    draw();
+    return;
+  }
+
   const labToggle = getLabToggleAt(x, y);
 
   if (labToggle) {
@@ -258,6 +275,14 @@ function onClick(event) {
   if (control) {
     state.metric = control.id;
     draw();
+    return;
+  }
+
+  const layout = getLayout(state.width, state.height);
+  if (layout.compact && state.filterPanelOpen && getFilterPanelAt(x, y)) return;
+  if (layout.compact && state.filterPanelOpen) {
+    state.filterPanelOpen = false;
+    draw();
   }
 }
 
@@ -274,7 +299,6 @@ function draw(now = performance.now()) {
   const drawnPoints = [];
 
   drawHeader(layout);
-  drawControls(layout);
   drawPlotSurface(layout);
   drawAxes(layout, scales);
   drawLines(layout, scales, drawnPoints, now);
@@ -282,6 +306,7 @@ function draw(now = performance.now()) {
   drawComparisonCursors(layout, scales);
   drawFootnotes(layout);
   drawHover(layout, drawnPoints);
+  drawControls(layout);
 }
 
 function drawBackdrop(width, height, now) {
@@ -323,7 +348,7 @@ function drawBackdrop(width, height, now) {
 function getLayout(width, height) {
   const compact = width < 980 || height < 560;
   const margin = compact
-    ? { top: 188, right: 20, bottom: 46, left: 58 }
+    ? { top: 164, right: 14, bottom: 38, left: 48 }
     : { top: 132, right: 184, bottom: 72, left: 86 };
 
   return {
@@ -401,13 +426,15 @@ function drawControls(layout) {
   state.controls = [];
   state.labToggles = [];
   state.cohortToggles = [];
+  state.filterButton = null;
+  state.filterPanel = null;
 
   ctx.save();
 
   if (compact) {
-    drawMetricControls(20, y, compact);
-    drawLabToggles(20, y + 48, compact);
-    drawCohortToggles(20, y + 84, compact);
+    drawMetricControls(18, y, compact);
+    drawFilterButton(18, y + 40, compact);
+    if (state.filterPanelOpen) drawCompactFilterPanel(layout, y + 78);
   } else {
     const right = width - 34;
     const metricWidth = measureMetricControlsWidth(compact);
@@ -422,6 +449,71 @@ function drawControls(layout) {
     drawMetricControls(metricX, y, compact);
   }
 
+  ctx.restore();
+}
+
+function drawFilterButton(x, y, compact) {
+  const h = 30;
+  const w = compact ? 138 : 148;
+  const active = state.filterPanelOpen;
+  const enabled = state.enabledLabs.size + state.enabledCohorts.size;
+  const total = state.data.labs.size + cohortOptions.length;
+  const text = `Filters ${enabled}/${total}`;
+
+  roundedRect(x, y, w, h, 15);
+  ctx.fillStyle = active ? "#111827" : "rgba(255, 255, 255, 0.78)";
+  ctx.fill();
+  ctx.strokeStyle = active ? "#111827" : "rgba(17, 24, 39, 0.14)";
+  ctx.stroke();
+
+  ctx.fillStyle = active ? "#ffffff" : "rgba(17, 24, 39, 0.72)";
+  ctx.font = `600 ${compact ? 12 : 13}px Inter, system-ui, sans-serif`;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, x + 14, y + h / 2 + 0.5);
+  drawChevron(x + w - 22, y + h / 2, active, active ? "#ffffff" : "rgba(17, 24, 39, 0.62)");
+
+  state.filterButton = { x, y, w, h };
+}
+
+function drawCompactFilterPanel(layout, y) {
+  const x = 18;
+  const w = layout.width - 36;
+  const h = 128;
+  state.filterPanel = { x, y, w, h };
+  shadowedPanel(x, y, w, h, 12);
+
+  ctx.save();
+  ctx.fillStyle = "rgba(17, 24, 39, 0.5)";
+  ctx.font = "600 10px Inter, system-ui, sans-serif";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillText("Labs", x + 14, y + 24);
+  drawLabToggles(x + 14, y + 50, true);
+  ctx.fillStyle = "rgba(17, 24, 39, 0.5)";
+  ctx.font = "600 10px Inter, system-ui, sans-serif";
+  ctx.fillText("Models", x + 14, y + 82);
+  drawCohortToggles(x + 14, y + 106, true);
+  ctx.restore();
+}
+
+function drawChevron(x, y, open, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.8;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  if (open) {
+    ctx.moveTo(x - 4, y + 2);
+    ctx.lineTo(x, y - 2);
+    ctx.lineTo(x + 4, y + 2);
+  } else {
+    ctx.moveTo(x - 4, y - 2);
+    ctx.lineTo(x, y + 2);
+    ctx.lineTo(x + 4, y - 2);
+  }
+  ctx.stroke();
   ctx.restore();
 }
 
@@ -504,14 +596,16 @@ function drawAxes(layout, scales) {
     ctx.fillText(String(year), x, chart.y + chart.h + 14);
   });
 
-  ctx.save();
-  ctx.translate(compact ? 16 : 28, chart.y + chart.h / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillStyle = "rgba(17, 24, 39, 0.58)";
-  ctx.textAlign = "center";
-  ctx.font = `${compact ? 10 : 12}px Inter, system-ui, sans-serif`;
-  ctx.fillText(`${metricLabel(state.metric)} price, USD per 1M tokens (log)`, 0, 0);
-  ctx.restore();
+  if (!compact) {
+    ctx.save();
+    ctx.translate(28, chart.y + chart.h / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = "rgba(17, 24, 39, 0.58)";
+    ctx.textAlign = "center";
+    ctx.font = "12px Inter, system-ui, sans-serif";
+    ctx.fillText(`${metricLabel(state.metric)} price, USD per 1M tokens (log)`, 0, 0);
+    ctx.restore();
+  }
 
   ctx.restore();
 }
@@ -679,8 +773,8 @@ function drawComparisonCursorLine(layout, x) {
 function drawComparisonHandle(layout, x) {
   const { chart, compact } = layout;
   const handleY = chart.y + chart.h / 2;
-  const handleW = compact ? 16 : 18;
-  const handleH = compact ? 44 : 54;
+  const handleW = compact ? 20 : 18;
+  const handleH = compact ? 58 : 54;
   roundedRect(x - handleW / 2, handleY - handleH / 2, handleW, handleH, handleW / 2);
   ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
   ctx.fill();
@@ -1055,6 +1149,7 @@ function getPointerCursor(pointer) {
   if (
     getLabToggleAt(pointer.x, pointer.y) ||
     getCohortToggleAt(pointer.x, pointer.y) ||
+    getFilterButtonAt(pointer.x, pointer.y) ||
     getControlAt(pointer.x, pointer.y)
   ) {
     return "pointer";
@@ -1078,6 +1173,18 @@ function getCohortToggleAt(x, y) {
   return state.cohortToggles.find(
     (item) => x >= item.x && x <= item.x + item.w && y >= item.y && y <= item.y + item.h
   );
+}
+
+function getFilterButtonAt(x, y) {
+  const item = state.filterButton;
+  if (!item) return null;
+  return x >= item.x && x <= item.x + item.w && y >= item.y && y <= item.y + item.h ? item : null;
+}
+
+function getFilterPanelAt(x, y) {
+  const item = state.filterPanel;
+  if (!item) return null;
+  return x >= item.x && x <= item.x + item.w && y >= item.y && y <= item.y + item.h ? item : null;
 }
 
 function toggleLab(labId) {
@@ -1124,8 +1231,8 @@ function getComparisonCursorAt(pointer) {
   ].sort((a, b) => Math.abs(pointer.x - a.x) - Math.abs(pointer.x - b.x));
 
   for (const cursor of cursors) {
-    const nearLine = Math.abs(pointer.x - cursor.x) <= 14 && pointer.y >= chart.y - 76 && pointer.y <= chart.y + chart.h + 10;
-    const nearHandle = Math.abs(pointer.x - cursor.x) <= 22 && Math.abs(pointer.y - handleY) <= 34;
+    const nearLine = Math.abs(pointer.x - cursor.x) <= (layout.compact ? 20 : 14) && pointer.y >= chart.y - 76 && pointer.y <= chart.y + chart.h + 10;
+    const nearHandle = Math.abs(pointer.x - cursor.x) <= (layout.compact ? 34 : 22) && Math.abs(pointer.y - handleY) <= (layout.compact ? 46 : 34);
     if (nearLine || nearHandle) return cursor.id;
   }
 

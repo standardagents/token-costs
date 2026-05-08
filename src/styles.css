@@ -15,4 +15,7 @@ canvas {
   width: 100vw;
   height: 100vh;
   cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
