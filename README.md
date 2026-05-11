@@ -2,6 +2,8 @@
 
 A dependency-free full-screen Canvas chart of OpenAI, Anthropic, and Google API token prices over time.
 
+The chart now includes a `Per IQ` mode that normalizes each release by the Artificial Analysis Intelligence Index using combined input + output token price.
+
 ## Run
 
 ```bash
@@ -13,6 +15,7 @@ Then open `http://localhost:5173`.
 ## Files
 
 - `data/model-prices.json` - researched release-price data and source URLs.
+- `data/model-intelligence.json` - per-release Artificial Analysis intelligence mappings and provenance notes.
 - `data/sources.md` - scope, caveats, and source notes.
 - `src/main.js` - Canvas renderer, hover/tap interactions, top lab/model-class toggles, and draggable comparison range cursors.
 - `assets/logos/*.svg` - provider SVG marks.

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Major AI lab API token prices over time",
-    "asOf": "2026-05-07",
+    "asOf": "2026-05-08",
     "currency": "USD",
     "unit": "per 1M tokens",
     "defaultMetric": "outputUsdPer1M",
@@ -152,9 +152,12 @@
     "anthropic-opus47": "https://www.anthropic.com/news/claude-opus-4-7",
     "google-io-2024": "https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/",
     "google-developer-may-2024": "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-gemma-developer-updates-may-2024/",
+    "google-gemini15-flash-price-drop": "https://developers.googleblog.com/en/gemini-15-flash-updates-google-ai-studio-gemini-api/",
+    "google-gemini15-flash8b": "https://developers.googleblog.com/en/gemini-15-flash-8b-is-now-generally-available-for-use/",
     "google-gemini25": "https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/",
     "google-gemini25-billing": "https://blog.google/products-and-platforms/products/gemini/gemini-preview-model-billing-update/",
     "google-gemini25-family": "https://blog.google/products-and-platforms/products/gemini/gemini-2-5-model-family-expands/",
+    "google-gemini25-flash-pricing-update": "https://developers.googleblog.com/gemini-2-5-thinking-model-updates/",
     "google-gemini3": "https://blog.google/products-and-platforms/products/gemini/gemini-3/",
     "google-gemini3-flash": "https://blog.google/products/gemini/gemini-3-flash/",
     "google-gemini31-pro": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro",
@@ -280,16 +283,28 @@
       ]
     },
     {
-      "date": "2024-09-24",
+      "date": "2024-08-12",
+      "lab": "google",
+      "series": "google-flash",
+      "model": "Gemini 1.5 Flash price drop",
+      "inputUsdPer1M": 0.075,
+      "outputUsdPer1M": 0.3,
+      "sourceIds": [
+        "google-gemini15-flash-price-drop"
+      ],
+      "note": "Official Gemini API price reduction for prompts under 128K tokens."
+    },
+    {
+      "date": "2024-10-03",
       "lab": "google",
       "series": "google-flash-lite",
       "model": "Gemini 1.5 Flash-8B",
       "inputUsdPer1M": 0.0375,
       "outputUsdPer1M": 0.15,
       "sourceIds": [
-        "google-pricing"
+        "google-gemini15-flash8b"
       ],
-      "note": "Historical low-cost Flash-8B point; Google later consolidated Flash-Lite pricing around Gemini 2.x/2.5."
+      "note": "Historical low-cost Flash-8B point; Google later consolidated this role into Flash-Lite."
     },
     {
       "date": "2024-10-22",
@@ -312,7 +327,19 @@
       "sourceIds": [
         "anthropic-35-models"
       ],
-      "note": "Launch price was reported as $1/$5; Anthropic revised the public price to $0.80/$4 on 2024-12-03."
+      "note": "Launch price; Anthropic revised the public price to $0.80/$4 on 2024-12-03."
+    },
+    {
+      "date": "2024-12-03",
+      "lab": "anthropic",
+      "series": "anthropic-haiku",
+      "model": "Claude 3.5 Haiku price revision",
+      "inputUsdPer1M": 0.8,
+      "outputUsdPer1M": 4,
+      "sourceIds": [
+        "anthropic-35-models"
+      ],
+      "note": "Anthropic revised Claude 3.5 Haiku pricing after launch."
     },
     {
       "date": "2025-02-05",
@@ -401,13 +428,15 @@
       "date": "2025-05-20",
       "lab": "google",
       "series": "google-flash",
-      "model": "Gemini 2.5 Flash",
-      "inputUsdPer1M": 0.3,
-      "outputUsdPer1M": 2.5,
+      "model": "Gemini 2.5 Flash Preview 05-20",
+      "inputUsdPer1M": 0.15,
+      "outputUsdPer1M": 3.5,
       "sourceIds": [
         "google-gemini25-family",
+        "google-gemini25-flash-pricing-update",
         "google-pricing"
-      ]
+      ],
+      "note": "Initial 05-20 preview pricing before the stable price update."
     },
     {
       "date": "2025-05-22",
@@ -430,6 +459,20 @@
       "sourceIds": [
         "anthropic-claude4"
       ]
+    },
+    {
+      "date": "2025-06-17",
+      "lab": "google",
+      "series": "google-flash",
+      "model": "Gemini 2.5 Flash",
+      "inputUsdPer1M": 0.3,
+      "outputUsdPer1M": 2.5,
+      "sourceIds": [
+        "google-gemini25-family",
+        "google-gemini25-flash-pricing-update",
+        "google-pricing"
+      ],
+      "note": "Stable release pricing removed the separate thinking/non-thinking price split."
     },
     {
       "date": "2025-06-17",
@@ -610,6 +653,18 @@
       "model": "gpt-5.4-mini",
       "inputUsdPer1M": 0.75,
       "outputUsdPer1M": 4.5,
+      "sourceIds": [
+        "openai-gpt54-mini",
+        "openai-pricing"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "lab": "openai",
+      "series": "openai-gpt-nano",
+      "model": "gpt-5.4-nano",
+      "inputUsdPer1M": 0.2,
+      "outputUsdPer1M": 1.25,
       "sourceIds": [
         "openai-gpt54-mini",
         "openai-pricing"

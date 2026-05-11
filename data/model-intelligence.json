@@ -1,0 +1,336 @@
+{
+  "meta": {
+    "benchmark": "Artificial Analysis Intelligence Index",
+    "asOf": "2026-05-11",
+    "valueFormula": "(inputUsdPer1M + outputUsdPer1M) / intelligenceScore",
+    "unit": "USD per 1M tokens per Artificial Analysis intelligence point",
+    "notes": [
+      "Scores come from public model pages on artificialanalysis.ai.",
+      "When Artificial Analysis tracks a later page for the same family, or the dataset row is a price-only update, the mapping reuses the closest relevant benchmark and records that in the resolution field."
+    ]
+  },
+  "scores": {
+    "gpt-4-0314": {
+      "score": 13,
+      "sourceModel": "GPT-4",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-4",
+      "sourceReleased": "March 14, 2023",
+      "resolution": "exact"
+    },
+    "Claude 2": {
+      "score": 9,
+      "sourceModel": "Claude 2.0",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-2",
+      "sourceReleased": "July 11, 2023",
+      "resolution": "exact"
+    },
+    "Claude 3 Opus": {
+      "score": 18,
+      "sourceModel": "Claude 3 Opus",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-3-opus",
+      "sourceReleased": "March 4, 2024",
+      "resolution": "exact"
+    },
+    "Claude 3 Sonnet": {
+      "score": 10,
+      "sourceModel": "Claude 3 Sonnet",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-3-sonnet",
+      "sourceReleased": "March 4, 2024",
+      "resolution": "exact"
+    },
+    "Claude 3 Haiku": {
+      "score": 12,
+      "sourceModel": "Claude 3 Haiku",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-3-haiku",
+      "sourceReleased": "March 4, 2024",
+      "resolution": "exact"
+    },
+    "gpt-4o": {
+      "score": 14,
+      "sourceModel": "GPT-4o (May)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-4o-2024-05-13",
+      "sourceReleased": "May 13, 2024",
+      "resolution": "exact"
+    },
+    "Gemini 1.5 Pro": {
+      "score": 16,
+      "sourceModel": "Gemini 1.5 Pro (Sep)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-1-5-pro",
+      "sourceReleased": "September 24, 2024",
+      "resolution": "family_proxy",
+      "note": "Artificial Analysis first tracks Gemini 1.5 Pro in September 2024, so this price row reuses the closest tracked family benchmark."
+    },
+    "Gemini 1.5 Flash": {
+      "score": 14,
+      "sourceModel": "Gemini 1.5 Flash (Sep)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-1-5-flash",
+      "sourceReleased": "September 24, 2024",
+      "resolution": "family_proxy",
+      "note": "Artificial Analysis first tracks Gemini 1.5 Flash in September 2024, so this price row reuses the closest tracked family benchmark."
+    },
+    "Claude 3.5 Sonnet": {
+      "score": 14,
+      "sourceModel": "Claude 3.5 Sonnet (June)",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-35-sonnet-june-24",
+      "sourceReleased": "June 21, 2024",
+      "resolution": "exact"
+    },
+    "gpt-4o-mini": {
+      "score": 13,
+      "sourceModel": "GPT-4o mini",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-4o-mini",
+      "sourceReleased": "July 18, 2024",
+      "resolution": "exact"
+    },
+    "Gemini 1.5 Flash price drop": {
+      "score": 14,
+      "sourceModel": "Gemini 1.5 Flash (Sep)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-1-5-flash",
+      "sourceReleased": "September 24, 2024",
+      "resolution": "price_update",
+      "note": "Price-only update; reuses the Gemini 1.5 Flash family benchmark."
+    },
+    "Gemini 1.5 Flash-8B": {
+      "score": 11,
+      "sourceModel": "Gemini 1.5 Flash-8B",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-1-5-flash-8b",
+      "sourceReleased": "October 3, 2024",
+      "resolution": "exact"
+    },
+    "Claude 3.5 Sonnet v2": {
+      "score": 16,
+      "sourceModel": "Claude 3.5 Sonnet (Oct)",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-35-sonnet",
+      "sourceReleased": "October 22, 2024",
+      "resolution": "exact"
+    },
+    "Claude 3.5 Haiku": {
+      "score": 19,
+      "sourceModel": "Claude 3.5 Haiku",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-3-5-haiku",
+      "sourceReleased": "October 22, 2024",
+      "resolution": "exact"
+    },
+    "Claude 3.5 Haiku price revision": {
+      "score": 19,
+      "sourceModel": "Claude 3.5 Haiku",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-3-5-haiku",
+      "sourceReleased": "October 22, 2024",
+      "resolution": "price_update",
+      "note": "Price-only update; reuses the Claude 3.5 Haiku benchmark."
+    },
+    "Gemini 2.0 Flash": {
+      "score": 19,
+      "sourceModel": "Gemini 2.0 Flash",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-2-0-flash",
+      "sourceReleased": "February 5, 2025",
+      "resolution": "exact"
+    },
+    "Gemini 2.0 Flash-Lite": {
+      "score": 15,
+      "sourceModel": "Gemini 2.0 Flash-Lite (Feb)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-2-0-flash-lite-001",
+      "sourceReleased": "February 25, 2025",
+      "resolution": "family_proxy",
+      "note": "Artificial Analysis tracks the February 2025 Gemini 2.0 Flash-Lite 001 release; this chart uses that score for the earlier public price row."
+    },
+    "Claude 3.7 Sonnet": {
+      "score": 31,
+      "sourceModel": "Claude 3.7 Sonnet",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-3-7-sonnet",
+      "sourceReleased": "February 24, 2025",
+      "resolution": "exact"
+    },
+    "Gemini 2.5 Pro Preview": {
+      "score": 30,
+      "sourceModel": "Gemini 2.5 Pro (Mar)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-2-5-pro-03-25",
+      "sourceReleased": "March 25, 2025",
+      "resolution": "family_proxy",
+      "note": "This price row reflects the paid preview billing update on April 9, 2025; the score comes from Artificial Analysis' closest tracked Gemini 2.5 Pro Preview page from March 25, 2025."
+    },
+    "gpt-4.1": {
+      "score": 26,
+      "sourceModel": "GPT-4.1",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-4-1",
+      "sourceReleased": "April 14, 2025",
+      "resolution": "exact"
+    },
+    "gpt-4.1-mini": {
+      "score": 23,
+      "sourceModel": "GPT-4.1 mini",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-4-1-mini",
+      "sourceReleased": "April 14, 2025",
+      "resolution": "exact"
+    },
+    "gpt-4.1-nano": {
+      "score": 13,
+      "sourceModel": "GPT-4.1 nano",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-4-1-nano",
+      "sourceReleased": "April 14, 2025",
+      "resolution": "exact"
+    },
+    "Gemini 2.5 Flash Preview 05-20": {
+      "score": 21,
+      "sourceModel": "Gemini 2.5 Flash",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-2-5-flash",
+      "sourceReleased": "May 20, 2025",
+      "resolution": "exact"
+    },
+    "Claude Opus 4": {
+      "score": 33,
+      "sourceModel": "Claude 4 Opus",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-4-opus",
+      "sourceReleased": "May 22, 2025",
+      "resolution": "exact"
+    },
+    "Claude Sonnet 4": {
+      "score": 33,
+      "sourceModel": "Claude 4 Sonnet",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-4-sonnet",
+      "sourceReleased": "May 22, 2025",
+      "resolution": "exact"
+    },
+    "Gemini 2.5 Flash": {
+      "score": 21,
+      "sourceModel": "Gemini 2.5 Flash",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-2-5-flash",
+      "sourceReleased": "May 20, 2025",
+      "resolution": "price_update",
+      "note": "Stable price update; reuses the May 20, 2025 Gemini 2.5 Flash benchmark."
+    },
+    "Gemini 2.5 Flash-Lite": {
+      "score": 13,
+      "sourceModel": "Gemini 2.5 Flash-Lite",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-2-5-flash-lite",
+      "sourceReleased": "June 17, 2025",
+      "resolution": "exact"
+    },
+    "Claude Opus 4.1": {
+      "score": 36,
+      "sourceModel": "Claude 4.1 Opus",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-4-1-opus",
+      "sourceReleased": "August 5, 2025",
+      "resolution": "exact"
+    },
+    "gpt-5": {
+      "score": 45,
+      "sourceModel": "GPT-5 (high)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5",
+      "sourceReleased": "August 7, 2025",
+      "resolution": "exact"
+    },
+    "gpt-5-mini": {
+      "score": 41,
+      "sourceModel": "GPT-5 mini (high)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-mini",
+      "sourceReleased": "August 7, 2025",
+      "resolution": "exact"
+    },
+    "gpt-5-nano": {
+      "score": 27,
+      "sourceModel": "GPT-5 nano (high)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-nano",
+      "sourceReleased": "August 7, 2025",
+      "resolution": "exact"
+    },
+    "Claude Sonnet 4.5": {
+      "score": 37,
+      "sourceModel": "Claude 4.5 Sonnet",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-4-5-sonnet",
+      "sourceReleased": "September 29, 2025",
+      "resolution": "exact"
+    },
+    "Claude Haiku 4.5": {
+      "score": 31,
+      "sourceModel": "Claude 4.5 Haiku",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-4-5-haiku",
+      "sourceReleased": "October 15, 2025",
+      "resolution": "exact"
+    },
+    "Gemini 3 Pro": {
+      "score": 48,
+      "sourceModel": "Gemini 3 Pro Preview (high)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-3-pro",
+      "sourceReleased": "November 18, 2025",
+      "resolution": "exact"
+    },
+    "Claude Opus 4.5": {
+      "score": 43,
+      "sourceModel": "Claude Opus 4.5",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-opus-4-5",
+      "sourceReleased": "November 24, 2025",
+      "resolution": "exact"
+    },
+    "Gemini 3 Flash": {
+      "score": 35,
+      "sourceModel": "Gemini 3 Flash",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-3-flash",
+      "sourceReleased": "December 17, 2025",
+      "resolution": "exact"
+    },
+    "Claude Opus 4.6": {
+      "score": 46,
+      "sourceModel": "Claude Opus 4.6 (high)",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-opus-4-6",
+      "sourceReleased": "February 5, 2026",
+      "resolution": "exact"
+    },
+    "Claude Sonnet 4.6": {
+      "score": 44,
+      "sourceModel": "Claude Sonnet 4.6 (Non-reasoning)",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-sonnet-4-6",
+      "sourceReleased": "February 17, 2026",
+      "resolution": "exact"
+    },
+    "Gemini 3.1 Pro Preview": {
+      "score": 57,
+      "sourceModel": "Gemini 3.1 Pro Preview",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-3-1-pro-preview",
+      "sourceReleased": "February 19, 2026",
+      "resolution": "exact"
+    },
+    "Gemini 3.1 Flash-Lite": {
+      "score": 34,
+      "sourceModel": "Gemini 3.1 Flash-Lite Preview",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-3-1-flash-lite-preview",
+      "sourceReleased": "March 3, 2026",
+      "resolution": "exact"
+    },
+    "gpt-5.4": {
+      "score": 57,
+      "sourceModel": "GPT-5.4 (xhigh)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-4",
+      "sourceReleased": "March 5, 2026",
+      "resolution": "exact"
+    },
+    "gpt-5.4-mini": {
+      "score": 49,
+      "sourceModel": "GPT-5.4 mini (xhigh)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-4-mini",
+      "sourceReleased": "March 17, 2026",
+      "resolution": "exact"
+    },
+    "gpt-5.4-nano": {
+      "score": 44,
+      "sourceModel": "GPT-5.4 nano (xhigh)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-4-nano",
+      "sourceReleased": "March 17, 2026",
+      "resolution": "exact"
+    },
+    "Claude Opus 4.7": {
+      "score": 57,
+      "sourceModel": "Claude Opus 4.7 (max)",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-opus-4-7",
+      "sourceReleased": "April 16, 2026",
+      "resolution": "exact"
+    },
+    "gpt-5.5": {
+      "score": 60,
+      "sourceModel": "GPT-5.5 (xhigh)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-5",
+      "sourceReleased": "April 23, 2026",
+      "resolution": "exact"
+    }
+  }
+}
