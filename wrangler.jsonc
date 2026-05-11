@@ -18,4 +18,6 @@
       "bucket_name": "are-tokens-getting-cheaper-og"
     }
   ]
+  // Required secret (set with: wrangler secret put WAITLIST_API_TOKEN):
+  // WAITLIST_API_TOKEN — bearer token for the Standard Agents waitlist API
 }

@@ -21,7 +21,7 @@ export function renderOgSvg(data, view) {
   const activeWidth = Math.max(2, endX - startX);
   const lines = renderSeries(data, view, chart, scales);
   const grid = renderGrid(chart, scales);
-  const answer = renderAnswerText(stats, 66, 330, 462);
+  const answer = renderAnswerText(stats, 66, 352, 462);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
@@ -46,8 +46,8 @@ export function renderOgSvg(data, view) {
   <rect width="${WIDTH}" height="${HEIGHT}" fill="url(#wash)"/>
   <g transform="translate(64 56) scale(0.28)" fill="#1f2937"><path d="${MARK_PATH}"/></g>
   <text x="124" y="78" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#1f2937">Standard Agents</text>
-  <text x="64" y="166" font-family="Inter, Arial, sans-serif" font-size="62" font-weight="800" fill="#111827">Are tokens</text>
-  <text x="64" y="236" font-family="Inter, Arial, sans-serif" font-size="62" font-weight="800" fill="#111827">getting cheaper?</text>
+  <text x="64" y="188" font-family="Inter, Arial, sans-serif" font-size="62" font-weight="800" fill="#111827">Are tokens</text>
+  <text x="64" y="258" font-family="Inter, Arial, sans-serif" font-size="62" font-weight="800" fill="#111827">getting cheaper?</text>
   ${answer}
   <rect x="${chart.x}" y="${chart.y}" width="${chart.w}" height="${chart.h}" rx="0" fill="#ffffff" fill-opacity="0.34" stroke="#111827" stroke-opacity="0.08"/>
   ${grid}

@@ -35,6 +35,52 @@
   </head>
   <body>
     <canvas id="price-canvas" aria-label="Line chart of OpenAI, Anthropic, and Google API token prices over time"></canvas>
+    <div class="share-pop" id="share-pop" hidden role="dialog" aria-label="Share this view">
+      <div class="share-pop-preview">
+        <img class="share-pop-img" id="share-pop-img" alt="Preview of the OG image" />
+        <div class="share-pop-skeleton" id="share-pop-skeleton" aria-hidden="true"></div>
+      </div>
+      <div class="share-pop-actions">
+        <button class="share-pop-copy" id="share-pop-copy" type="button">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M5 4V3a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-1M3 5h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="share-pop-copy-label">Copy link</span>
+        </button>
+        <div class="share-pop-intents">
+          <a class="share-pop-intent" data-intent="x" href="#" target="_blank" rel="noopener" title="Post to X">
+            <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M9.2 7.1 14.6 1h-1.4L8.6 6.3 5 1H.6l5.7 8.2L.6 15.6H2l5-5.7 4 5.7H15.4l-6-8.5zM7.7 9.2l-.6-.8L2.5 2h2.2l3.7 5.3.6.8 4.8 6.8h-2.2L7.7 9.2z"/></svg>
+          </a>
+          <a class="share-pop-intent" data-intent="bluesky" href="#" target="_blank" rel="noopener" title="Post to Bluesky">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3.5 1.6c1.9 1.4 3.9 4.3 4.5 5.9.6-1.6 2.6-4.5 4.5-5.9 1.4-1 3.5-1.8 3.5.6 0 .5-.3 4-.4 4.6-.5 2-2.6 2.5-4.4 2.2 3.2.5 4 2.3 2.2 4.1-3.4 3.5-4.9-.9-5.3-2-.1-.2-.1-.3-.1-.2 0-.1 0 0-.1.2-.4 1.1-1.9 5.5-5.3 2-1.8-1.8-1-3.6 2.2-4.1-1.8.3-3.9-.2-4.4-2.2C.3 6.2 0 2.7 0 2.2c0-2.4 2.1-1.6 3.5-.6z"/></svg>
+          </a>
+          <a class="share-pop-intent" data-intent="linkedin" href="#" target="_blank" rel="noopener" title="Post to LinkedIn">
+            <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M3.5 1.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM1.7 6.2h3.6V15H1.7zM7 6.2h3.4v1.2h.1c.5-.9 1.6-1.5 2.9-1.5 3.1 0 3.6 2 3.6 4.7V15h-3.6v-3.9c0-1 0-2.2-1.3-2.2s-1.5 1-1.5 2.1V15H7z"/></svg>
+          </a>
+          <a class="share-pop-intent" data-intent="hn" href="#" target="_blank" rel="noopener" title="Post to Hacker News">
+            <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M2 1h12v14H2z" opacity=".0"/><path fill="currentColor" d="M0 0v16h16V0H0zm8.7 8.7V13H7.3V8.7L4 2h1.7l2.3 4.6L10.4 2H12L8.7 8.7z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <aside class="sa-bar" id="sa-bar" aria-label="Standard Agents early access">
+      <a class="sa-bar-brand" href="https://standardagents.com" target="_blank" rel="noopener">
+        <svg class="sa-bar-mark" viewBox="0 0 150 150" aria-hidden="true">
+          <path fill="currentColor" d="M44.06,0v44.08H0v105.92h105.93v-44.07h44.07V0H44.06ZM19.09,130.91c-16.47-16.47-5.29-54.45,24.96-85.18v60.2h60.23c-30.73,30.27-68.71,41.47-85.2,24.98ZM105.93,104.29v-60.21h-60.21C76.46,13.8,114.42,2.6,130.91,19.09c16.51,16.49,5.31,54.47-24.98,85.2Z"/>
+        </svg>
+        <span class="sa-bar-name">Standard Agents</span>
+      </a>
+      <span class="sa-bar-sep" aria-hidden="true">·</span>
+      <span class="sa-bar-pitch">An open standard for safe, composable AI agents</span>
+      <form class="sa-bar-form" id="sa-bar-form" autocomplete="on">
+        <input class="sa-bar-input sa-bar-input--name" id="sa-bar-name" name="name" type="text" placeholder="Name" aria-label="Name" required />
+        <input class="sa-bar-input" id="sa-bar-email" name="email" type="email" placeholder="you@email.com" aria-label="Email" required />
+        <button class="sa-bar-submit" id="sa-bar-submit" type="submit">
+          <span class="sa-bar-submit-label">Join early access</span>
+          <svg class="sa-bar-arrow" viewBox="0 0 14 14" width="11" height="11" aria-hidden="true"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg class="sa-bar-spinner" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" style="display:none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" opacity="0.25" fill="none"/><path d="M8 2a6 6 0 0 1 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        </button>
+      </form>
+      <span class="sa-bar-status" id="sa-bar-status" role="status" aria-live="polite"></span>
+    </aside>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

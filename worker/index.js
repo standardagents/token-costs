@@ -9,6 +9,8 @@ import { renderOgSvg } from "../src/og-svg.js";
 const DATA = normalizeData(priceData, intelligenceData);
 const OG_TTL_SECONDS = 60 * 24 * 60 * 60;
 const OG_CACHE_CONTROL = `public, max-age=${OG_TTL_SECONDS}, s-maxage=${OG_TTL_SECONDS}, stale-while-revalidate=86400`;
+const WAITLIST_API = "https://agents.standardagentbuilder.com/api/waitlist";
+const WAITLIST_SOURCE = "tokens-getting-cheaper";
 let resvgReady;
 let fontBuffersReady;
 
@@ -20,6 +22,10 @@ export default {
       return handleOgImage(request, env, ctx);
     }
 
+    if (url.pathname === "/api/early-access" && request.method === "POST") {
+      return handleEarlyAccess(request, env);
+    }
+
     if (isDocumentRequest(request, url)) {
       return handleDocument(request, env);
     }
@@ -27,6 +33,38 @@ export default {
     return env.ASSETS.fetch(request);
   }
 };
+
+async function handleEarlyAccess(request, env) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const name = typeof body.name === "string" ? body.name.trim() : "";
+    const email = typeof body.email === "string" ? body.email.trim() : "";
+    if (!name || !email) {
+      return Response.json({ error: "Name and email are required" }, { status: 400 });
+    }
+    if (!env.WAITLIST_API_TOKEN) {
+      console.error("[early-access] WAITLIST_API_TOKEN is not set");
+      return Response.json({ error: "Server is missing credentials" }, { status: 500 });
+    }
+    const upstream = await fetch(WAITLIST_API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.WAITLIST_API_TOKEN}`
+      },
+      body: JSON.stringify({ email, name, source: WAITLIST_SOURCE })
+    });
+    if (!upstream.ok) {
+      const text = await upstream.text().catch(() => "");
+      console.warn(`[early-access] upstream ${upstream.status}: ${text}`);
+      return Response.json({ error: "Could not reach the waitlist" }, { status: 502 });
+    }
+    return Response.json({ ok: true });
+  } catch (error) {
+    console.error("[early-access] error:", error);
+    return Response.json({ error: "Unexpected error" }, { status: 500 });
+  }
+}
 
 async function handleDocument(request, env) {
   const assetResponse = await env.ASSETS.fetch(request);

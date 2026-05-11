@@ -1,7 +1,20 @@
 import * as pricing from "./pricing.js";
+import priceData from "../data/model-prices.json";
+import intelligenceData from "../data/model-intelligence.json";
 
 const canvas = document.getElementById("price-canvas");
 const ctx = canvas.getContext("2d");
+
+const THEME_STORAGE_KEY = "tokens-theme";
+const systemDarkMedia = window.matchMedia("(prefers-color-scheme: dark)");
+const initialTheme = (() => {
+  try {
+    const stored = window.localStorage?.getItem(THEME_STORAGE_KEY);
+    if (stored === "light" || stored === "dark") return stored;
+  } catch {}
+  return systemDarkMedia.matches ? "dark" : "light";
+})();
+document.documentElement.setAttribute("data-theme", initialTheme);
 
 const state = {
   data: null,
@@ -9,6 +22,11 @@ const state = {
   width: 0,
   height: 0,
   metric: "outputUsdPer1M",
+  theme: initialTheme,
+  themePreference: (() => {
+    try { return window.localStorage?.getItem(THEME_STORAGE_KEY) || "system"; }
+    catch { return "system"; }
+  })(),
   hover: null,
   pointer: { x: -1, y: -1 },
   controls: [],
@@ -17,6 +35,7 @@ const state = {
   shareButton: null,
   filterButton: null,
   filterPanel: null,
+  themeButton: null,
   bubblePanel: null,
   bubbleMinimizeButton: null,
   bubbleMinimized: false,
@@ -29,9 +48,159 @@ const state = {
   urlSyncPending: false,
   shareCopiedUntil: 0,
   filterPanelOpen: false,
+  sharePopOpen: false,
+  sharePopUrl: null,
   reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   animationStart: performance.now()
 };
+
+systemDarkMedia.addEventListener?.("change", (event) => {
+  if (state.themePreference !== "system") return;
+  state.theme = event.matches ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", state.theme);
+  draw();
+});
+
+const THEMES = {
+  light: {
+    bg1: "#fbfcfe",
+    bg2: "#f4f6fa",
+    bg3: "#eef1f6",
+    glow: [255, 255, 255],
+    tint: [199, 213, 234],
+    tintAlpha: 0.28,
+    surface: "rgba(255, 255, 255, 0.55)",
+    plotBorder: "rgba(17, 24, 39, 0.06)",
+    panel: "#ffffff",
+    panelShadow: "rgba(15, 23, 42, 0.09)",
+    panelBorder: "rgba(17, 24, 39, 0.06)",
+    titleInk: "#0b1220",
+    subtitleInk: "rgba(31, 41, 55, 0.62)",
+    asOfInk: "rgba(17, 24, 39, 0.48)",
+    bodyInk: "rgba(17, 24, 39, 0.7)",
+    bodyInkSoft: "rgba(17, 24, 39, 0.62)",
+    bodyInkSofter: "rgba(17, 24, 39, 0.48)",
+    bodyInkVeryFaint: "rgba(17, 24, 39, 0.06)",
+    chartGrid: "rgba(17, 24, 39, 0.075)",
+    chartGridStrong: "rgba(17, 24, 39, 0.18)",
+    axisInk: "rgba(17, 24, 39, 0.55)",
+    axisLabelInk: "rgba(17, 24, 39, 0.58)",
+    yearInk: "rgba(17, 24, 39, 0.54)",
+    extendedSeries: "rgba(107, 114, 128, 0.72)",
+    extendedSeriesPath: [107, 114, 128],
+    ringRim: "rgba(255, 255, 255, 0.9)",
+    seriesLabelInk: "rgba(17, 24, 39, 0.76)",
+    cursorLine: "rgba(17, 24, 39, 0.42)",
+    handleFill: "#ffffff",
+    handleBorder: "rgba(17, 24, 39, 0.12)",
+    handleGrip: "rgba(17, 24, 39, 0.36)",
+    handleShadow: "rgba(15, 23, 42, 0.12)",
+    controlBg: "#ffffff",
+    controlBorder: "rgba(17, 24, 39, 0.08)",
+    controlInk: "rgba(17, 24, 39, 0.68)",
+    controlDivider: "rgba(17, 24, 39, 0.07)",
+    controlShadow: "rgba(15, 23, 42, 0.05)",
+    controlActiveBg: "#0b1220",
+    controlActiveInk: "#ffffff",
+    controlActiveShadow: "rgba(15, 23, 42, 0.18)",
+    softButtonShadow: "rgba(15, 23, 42, 0.05)",
+    softButtonBorder: "rgba(17, 24, 39, 0.08)",
+    softButtonInk: "rgba(17, 24, 39, 0.72)",
+    softButtonDim: "rgba(17, 24, 39, 0.6)",
+    softButtonActiveBorder: "rgba(11, 18, 32, 0.92)",
+    checkBg: "#ffffff",
+    checkBorder: "rgba(17, 24, 39, 0.14)",
+    checkOffInk: "rgba(107, 114, 128, 0.48)",
+    checkOnInk: "rgba(17, 24, 39, 0.74)",
+    cohortOnInk: "rgba(17, 24, 39, 0.76)",
+    sectionLabel: "rgba(17, 24, 39, 0.42)",
+    hoverLine: "rgba(17, 24, 39, 0.14)",
+    hoverTableBg: "rgba(247, 248, 251, 0.95)",
+    hoverTableBorder: "rgba(17, 24, 39, 0.08)",
+    hoverRowDivider: "rgba(17, 24, 39, 0.06)",
+    hoverLabelInk: "rgba(17, 24, 39, 0.6)",
+    hoverValueInk: "#111827",
+    hoverMetaInk: "rgba(17, 24, 39, 0.62)",
+    hoverNoteInk: "rgba(17, 24, 39, 0.54)",
+    bubbleConnector: "rgba(17, 24, 39, 0.16)",
+    minimizeInk: "rgba(17, 24, 39, 0.42)",
+    minimizeInkActive: "rgba(17, 24, 39, 0.85)"
+  },
+  dark: {
+    bg1: "#0a0d14",
+    bg2: "#0c1019",
+    bg3: "#0e1422",
+    glow: [80, 110, 170],
+    tint: [40, 60, 100],
+    tintAlpha: 0.22,
+    surface: "rgba(255, 255, 255, 0.025)",
+    plotBorder: "rgba(255, 255, 255, 0.06)",
+    panel: "#161b27",
+    panelShadow: "rgba(0, 0, 0, 0.45)",
+    panelBorder: "rgba(255, 255, 255, 0.06)",
+    titleInk: "#f3f6fb",
+    subtitleInk: "rgba(226, 232, 240, 0.62)",
+    asOfInk: "rgba(226, 232, 240, 0.42)",
+    bodyInk: "rgba(226, 232, 240, 0.72)",
+    bodyInkSoft: "rgba(226, 232, 240, 0.6)",
+    bodyInkSofter: "rgba(226, 232, 240, 0.45)",
+    bodyInkVeryFaint: "rgba(255, 255, 255, 0.06)",
+    chartGrid: "rgba(255, 255, 255, 0.06)",
+    chartGridStrong: "rgba(255, 255, 255, 0.14)",
+    axisInk: "rgba(226, 232, 240, 0.5)",
+    axisLabelInk: "rgba(226, 232, 240, 0.52)",
+    yearInk: "rgba(226, 232, 240, 0.5)",
+    extendedSeries: "rgba(148, 163, 184, 0.5)",
+    extendedSeriesPath: [148, 163, 184],
+    ringRim: "rgba(8, 12, 22, 0.9)",
+    seriesLabelInk: "rgba(226, 232, 240, 0.74)",
+    cursorLine: "rgba(226, 232, 240, 0.4)",
+    handleFill: "#222837",
+    handleBorder: "rgba(255, 255, 255, 0.16)",
+    handleGrip: "rgba(226, 232, 240, 0.55)",
+    handleShadow: "rgba(0, 0, 0, 0.5)",
+    controlBg: "rgba(255, 255, 255, 0.04)",
+    controlBorder: "rgba(255, 255, 255, 0.08)",
+    controlInk: "rgba(226, 232, 240, 0.7)",
+    controlDivider: "rgba(255, 255, 255, 0.06)",
+    controlShadow: "rgba(0, 0, 0, 0.4)",
+    controlActiveBg: "#f1f5f9",
+    controlActiveInk: "#0b1220",
+    controlActiveShadow: "rgba(0, 0, 0, 0.5)",
+    softButtonShadow: "rgba(0, 0, 0, 0.4)",
+    softButtonBorder: "rgba(255, 255, 255, 0.1)",
+    softButtonInk: "rgba(226, 232, 240, 0.78)",
+    softButtonDim: "rgba(226, 232, 240, 0.58)",
+    softButtonActiveBorder: "rgba(241, 245, 249, 0.92)",
+    checkBg: "rgba(255, 255, 255, 0.04)",
+    checkBorder: "rgba(255, 255, 255, 0.18)",
+    checkOffInk: "rgba(148, 163, 184, 0.55)",
+    checkOnInk: "rgba(232, 238, 248, 0.85)",
+    cohortOnInk: "rgba(232, 238, 248, 0.88)",
+    sectionLabel: "rgba(226, 232, 240, 0.42)",
+    hoverLine: "rgba(255, 255, 255, 0.14)",
+    hoverTableBg: "rgba(18, 23, 33, 0.95)",
+    hoverTableBorder: "rgba(255, 255, 255, 0.08)",
+    hoverRowDivider: "rgba(255, 255, 255, 0.06)",
+    hoverLabelInk: "rgba(226, 232, 240, 0.6)",
+    hoverValueInk: "#f3f6fb",
+    hoverMetaInk: "rgba(226, 232, 240, 0.62)",
+    hoverNoteInk: "rgba(226, 232, 240, 0.5)",
+    bubbleConnector: "rgba(255, 255, 255, 0.18)",
+    minimizeInk: "rgba(226, 232, 240, 0.45)",
+    minimizeInkActive: "rgba(241, 245, 249, 0.9)"
+  }
+};
+
+function T() {
+  return THEMES[state.theme];
+}
+
+function getSaBarHeight() {
+  const value = getComputedStyle(document.documentElement).getPropertyValue("--sa-bar-h").trim();
+  const parsed = parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : 48;
+}
 
 const metricOptions = pricing.metricOptions;
 const cohortOptions = pricing.cohortOptions;
@@ -42,19 +211,12 @@ const money = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 4
 });
 
-Promise.all([
-  fetch("data/model-prices.json").then((response) => {
-    if (!response.ok) throw new Error(`Could not load data: ${response.status}`);
-    return response.json();
-  }),
-  fetch("data/model-intelligence.json").then((response) => {
-    if (!response.ok) throw new Error(`Could not load intelligence data: ${response.status}`);
-    return response.json();
-  })
-]).then(([data, intelligenceData]) => {
-  state.data = normalizeData(data, intelligenceData);
+try {
+  state.data = normalizeData(priceData, intelligenceData);
   applyViewState(pricing.createViewStateFromSearchParams(state.data, new URLSearchParams(window.location.search)));
   updateUrlFromState();
+  bindEarlyAccessForm();
+  bindSharePop();
   loadImages(state.data).then(() => {
     resize();
     window.addEventListener("resize", resize);
@@ -68,10 +230,10 @@ Promise.all([
     canvas.addEventListener("touchstart", onTouchStart, { passive: true });
     requestAnimationFrame(draw);
   });
-}).catch((error) => {
+} catch (error) {
   resize();
   drawError(error);
-});
+}
 
 function normalizeData(data, intelligenceData) {
   return pricing.normalizeData(data, intelligenceData);
@@ -102,6 +264,10 @@ function updateUrlFromState() {
   const nextUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
   window.history.replaceState(null, "", nextUrl);
   updateDocumentOgUrl(params);
+  if (state.sharePopOpen && !state.draggingCursor) {
+    setSharePopPreview();
+    state.sharePopUrl = getCurrentShareUrl();
+  }
 }
 
 function scheduleUrlSync() {
@@ -194,12 +360,13 @@ async function loadImages(data) {
 function resize() {
   state.dpr = Math.min(window.devicePixelRatio || 1, 2);
   state.width = Math.floor(window.innerWidth);
-  state.height = Math.floor(window.innerHeight);
+  state.height = Math.max(240, Math.floor(window.innerHeight) - getSaBarHeight());
   canvas.width = Math.floor(state.width * state.dpr);
   canvas.height = Math.floor(state.height * state.dpr);
   canvas.style.width = `${state.width}px`;
   canvas.style.height = `${state.height}px`;
   ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+  if (state.sharePopOpen) positionSharePop();
   draw();
 }
 
@@ -242,6 +409,7 @@ function onPointerDown(event) {
   const onShareButton = getShareButtonAt(pointer.x, pointer.y);
   const onFilterButton = getFilterButtonAt(pointer.x, pointer.y);
   const onFilterPanel = getFilterPanelAt(pointer.x, pointer.y);
+  const onThemeButton = getThemeButtonAt(pointer.x, pointer.y);
   const onBubbleMinimize = getBubbleMinimizeAt(pointer.x, pointer.y);
   const onBubblePanel = getBubblePanelAt(pointer.x, pointer.y);
   if (
@@ -251,6 +419,7 @@ function onPointerDown(event) {
     onShareButton ||
     onFilterButton ||
     onFilterPanel ||
+    onThemeButton ||
     onBubbleMinimize ||
     onBubblePanel
   ) return;
@@ -265,8 +434,9 @@ function onPointerDown(event) {
 }
 
 function onPointerUp() {
-  if (state.draggingCursor) updateUrlFromState();
+  const wasDragging = state.draggingCursor;
   state.draggingCursor = null;
+  if (wasDragging) updateUrlFromState();
 }
 
 function onTouchStart(event) {
@@ -287,7 +457,7 @@ function onClick(event) {
   const filterButton = getFilterButtonAt(x, y);
 
   if (shareButton) {
-    copyShareUrl();
+    toggleSharePop();
     return;
   }
 
@@ -295,6 +465,11 @@ function onClick(event) {
     state.filterPanelOpen = !state.filterPanelOpen;
     state.hover = null;
     draw();
+    return;
+  }
+
+  if (getThemeButtonAt(x, y)) {
+    toggleTheme();
     return;
   }
 
@@ -347,16 +522,152 @@ function onClick(event) {
   }
 }
 
-async function copyShareUrl() {
-  updateUrlFromState();
-  try {
-    await navigator.clipboard.writeText(window.location.href);
-    state.shareCopiedUntil = performance.now() + 1800;
-  } catch {
-    state.shareCopiedUntil = performance.now() + 1800;
+function getCurrentShareUrl() {
+  if (!state.data) return window.location.href;
+  const params = pricing.serializeViewState(state.data, getViewState());
+  const next = new URL(window.location.href);
+  next.search = params.toString();
+  return next.toString();
+}
+
+function getCurrentOgUrl() {
+  if (!state.data) return new URL("/api/og", window.location.origin).toString();
+  const params = pricing.serializeViewState(state.data, getViewState());
+  const og = new URL("/api/og", window.location.origin);
+  og.search = params.toString();
+  return og.toString();
+}
+
+function toggleSharePop() {
+  if (state.sharePopOpen) {
+    closeSharePop();
+  } else {
+    openSharePop();
   }
+}
+
+function openSharePop() {
+  const popup = document.getElementById("share-pop");
+  if (!popup) return;
+  state.sharePopOpen = true;
+  updateUrlFromState();
+  state.sharePopUrl = getCurrentShareUrl();
+  setSharePopPreview();
+  popup.hidden = false;
+  requestAnimationFrame(() => {
+    popup.setAttribute("data-open", "true");
+    positionSharePop();
+  });
   draw();
-  window.setTimeout(draw, 1850);
+  document.addEventListener("pointerdown", onSharePopOutsidePointer, true);
+  document.addEventListener("keydown", onSharePopKey);
+}
+
+function closeSharePop() {
+  if (!state.sharePopOpen) return;
+  state.sharePopOpen = false;
+  const popup = document.getElementById("share-pop");
+  if (popup) {
+    popup.removeAttribute("data-open");
+    window.setTimeout(() => {
+      if (!state.sharePopOpen) popup.hidden = true;
+    }, 180);
+  }
+  document.removeEventListener("pointerdown", onSharePopOutsidePointer, true);
+  document.removeEventListener("keydown", onSharePopKey);
+  draw();
+}
+
+function onSharePopOutsidePointer(event) {
+  const popup = document.getElementById("share-pop");
+  if (!popup) return;
+  if (popup.contains(event.target)) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  if (getShareButtonAt(x, y)) return;
+  closeSharePop();
+}
+
+function onSharePopKey(event) {
+  if (event.key === "Escape") closeSharePop();
+}
+
+function positionSharePop() {
+  const popup = document.getElementById("share-pop");
+  if (!popup || !state.shareButton) return;
+  const rect = canvas.getBoundingClientRect();
+  const btn = state.shareButton;
+  const popW = Math.min(360, window.innerWidth - 24);
+  const margin = 8;
+  const top = rect.top + btn.y + btn.h + 10;
+  let left = rect.left + btn.x;
+  if (left + popW + margin > window.innerWidth) {
+    left = Math.max(margin, window.innerWidth - popW - margin);
+  }
+  popup.style.left = `${Math.max(margin, left)}px`;
+  popup.style.top = `${Math.max(margin, top)}px`;
+  popup.style.width = `${popW}px`;
+}
+
+function setSharePopPreview() {
+  const img = document.getElementById("share-pop-img");
+  if (!img) return;
+  img.classList.remove("is-loaded");
+  img.removeAttribute("src");
+  const og = getCurrentOgUrl();
+  img.onload = () => img.classList.add("is-loaded");
+  img.src = og;
+}
+
+async function handleCopyShareLink() {
+  const url = state.sharePopUrl || getCurrentShareUrl();
+  const button = document.getElementById("share-pop-copy");
+  const labelEl = button?.querySelector(".share-pop-copy-label");
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch {}
+  if (button) {
+    button.classList.add("is-copied");
+    if (labelEl) labelEl.textContent = "Link copied";
+    window.setTimeout(() => {
+      button.classList.remove("is-copied");
+      if (labelEl) labelEl.textContent = "Copy link";
+    }, 1600);
+  }
+  state.shareCopiedUntil = performance.now() + 1800;
+  draw();
+}
+
+function buildShareIntentUrl(intent, url) {
+  const title = "Are tokens getting cheaper?";
+  switch (intent) {
+    case "x":
+      return `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
+    case "bluesky":
+      return `https://bsky.app/intent/compose?text=${encodeURIComponent(url)}`;
+    case "linkedin":
+      return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+    case "hn":
+      return `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(url)}&t=${encodeURIComponent(title)}`;
+    default:
+      return url;
+  }
+}
+
+function bindSharePop() {
+  const popup = document.getElementById("share-pop");
+  if (!popup) return;
+  const copyBtn = document.getElementById("share-pop-copy");
+  copyBtn?.addEventListener("click", handleCopyShareLink);
+  popup.querySelectorAll(".share-pop-intent").forEach((node) => {
+    node.addEventListener("click", (event) => {
+      event.preventDefault();
+      const intent = node.dataset.intent;
+      const url = state.sharePopUrl || getCurrentShareUrl();
+      window.open(buildShareIntentUrl(intent, url), "_blank", "noopener");
+    });
+  });
 }
 
 function draw(now = performance.now()) {
@@ -383,13 +694,14 @@ function draw(now = performance.now()) {
 }
 
 function drawBackdrop(width, height, now) {
+  const t = T();
   ctx.save();
   const pulse = state.reducedMotion ? 0 : Math.sin((now - state.animationStart) / 4200) * 0.015;
 
   const base = ctx.createLinearGradient(0, 0, 0, height);
-  base.addColorStop(0, "#fbfcfe");
-  base.addColorStop(0.55, "#f4f6fa");
-  base.addColorStop(1, "#eef1f6");
+  base.addColorStop(0, t.bg1);
+  base.addColorStop(0.55, t.bg2);
+  base.addColorStop(1, t.bg3);
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, width, height);
 
@@ -401,8 +713,9 @@ function drawBackdrop(width, height, now) {
     height * 0.02,
     Math.max(width, height) * 0.7
   );
-  glow.addColorStop(0, `rgba(255, 255, 255, ${0.7 + pulse})`);
-  glow.addColorStop(1, "rgba(255, 255, 255, 0)");
+  const [gr, gg, gb] = t.glow;
+  glow.addColorStop(0, `rgba(${gr}, ${gg}, ${gb}, ${(state.theme === "dark" ? 0.08 : 0.7) + pulse})`);
+  glow.addColorStop(1, `rgba(${gr}, ${gg}, ${gb}, 0)`);
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, width, height);
 
@@ -414,8 +727,9 @@ function drawBackdrop(width, height, now) {
     height * 1.05,
     Math.max(width, height) * 0.65
   );
-  tint.addColorStop(0, "rgba(199, 213, 234, 0.28)");
-  tint.addColorStop(1, "rgba(199, 213, 234, 0)");
+  const [tr, tg, tb] = t.tint;
+  tint.addColorStop(0, `rgba(${tr}, ${tg}, ${tb}, ${t.tintAlpha})`);
+  tint.addColorStop(1, `rgba(${tr}, ${tg}, ${tb}, 0)`);
   ctx.fillStyle = tint;
   ctx.fillRect(0, 0, width, height);
 
@@ -474,16 +788,19 @@ function getScales(layout) {
 
 function drawHeader(layout) {
   const { width, compact } = layout;
+  const t = T();
   const x = compact ? 20 : 36;
   const y = compact ? 24 : 32;
+  const themeBtnW = 32;
+  const asOfPadRight = compact ? x : x + themeBtnW + 12;
 
   ctx.save();
-  ctx.fillStyle = "#0b1220";
+  ctx.fillStyle = t.titleInk;
   ctx.font = `600 ${compact ? 22 : 32}px Inter, system-ui, sans-serif`;
   ctx.textBaseline = "top";
   ctx.fillText("Are tokens getting cheaper?", x, y);
 
-  ctx.fillStyle = "rgba(31, 41, 55, 0.62)";
+  ctx.fillStyle = t.subtitleInk;
   ctx.font = `${compact ? 12 : 14}px Inter, system-ui, sans-serif`;
   const subtitle =
     pricing.isIntelligenceMetric(state.metric)
@@ -497,11 +814,84 @@ function drawHeader(layout) {
 
   if (!compact) {
     ctx.textAlign = "right";
-    ctx.fillStyle = "rgba(17, 24, 39, 0.48)";
+    ctx.fillStyle = t.asOfInk;
     ctx.font = `500 12px Inter, system-ui, sans-serif`;
-    ctx.fillText(`Data as of ${state.data.meta.asOf}`, width - x, y + 10);
+    ctx.fillText(`Data as of ${state.data.meta.asOf}`, width - asOfPadRight, y + 10);
   }
   ctx.restore();
+
+  drawThemeToggle(layout);
+}
+
+function drawThemeToggle(layout) {
+  const compact = layout.compact;
+  const size = 32;
+  const x = layout.width - (compact ? 18 : 36) - size;
+  const y = compact ? 24 : 30;
+  const t = T();
+  const hovered = isPointerInRect(x, y, size, size);
+
+  ctx.save();
+  ctx.shadowColor = t.softButtonShadow;
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 2;
+  ctx.beginPath();
+  ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
+  ctx.fillStyle = t.controlBg;
+  ctx.fill();
+  ctx.restore();
+
+  ctx.beginPath();
+  ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
+  ctx.strokeStyle = t.softButtonBorder;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  drawThemeGlyph(x + size / 2, y + size / 2, hovered ? t.titleInk : t.softButtonDim);
+
+  state.themeButton = { x, y, w: size, h: size };
+}
+
+const MOON_PATH = new Path2D(
+  "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"
+);
+const SUN_PATH = new Path2D(
+  "M12 17.5a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11ZM12 4V2M12 22v-2M4 12H2M22 12h-2M5.64 5.64L4.22 4.22M19.78 19.78l-1.42-1.42M5.64 18.36l-1.42 1.42M19.78 4.22l-1.42 1.42"
+);
+
+function drawThemeGlyph(cx, cy, color) {
+  const glyphSize = 17;
+  const sourceSize = 24;
+  const scale = glyphSize / sourceSize;
+  ctx.save();
+  ctx.translate(cx - (sourceSize * scale) / 2, cy - (sourceSize * scale) / 2);
+  ctx.scale(scale, scale);
+  if (state.theme === "dark") {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.8;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.stroke(SUN_PATH);
+  } else {
+    ctx.fillStyle = color;
+    ctx.fill(MOON_PATH);
+  }
+  ctx.restore();
+}
+
+function toggleTheme() {
+  const next = state.theme === "dark" ? "light" : "dark";
+  state.theme = next;
+  state.themePreference = next;
+  document.documentElement.setAttribute("data-theme", next);
+  try { window.localStorage?.setItem(THEME_STORAGE_KEY, next); } catch {}
+  draw();
+}
+
+function getThemeButtonAt(x, y) {
+  const item = state.themeButton;
+  if (!item) return null;
+  return x >= item.x && x <= item.x + item.w && y >= item.y && y <= item.y + item.h ? item : null;
 }
 
 function drawControls(layout) {
@@ -609,15 +999,16 @@ function drawFilterButton(x, y, compact) {
   const enabled = state.enabledLabs.size + state.enabledCohorts.size;
   const total = state.data.labs.size + cohortOptions.length;
   const text = `Filters ${enabled}/${total}`;
+  const t = T();
 
   drawSoftButton(x, y, w, h, active);
 
-  ctx.fillStyle = active ? "#ffffff" : "rgba(17, 24, 39, 0.72)";
+  ctx.fillStyle = active ? t.controlActiveInk : t.softButtonInk;
   ctx.font = `600 ${compact ? 12 : 13}px Inter, system-ui, sans-serif`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillText(text, x + 14, y + h / 2 + 0.5);
-  drawChevron(x + w - 22, y + h / 2, active, active ? "#ffffff" : "rgba(17, 24, 39, 0.6)");
+  drawChevron(x + w - 22, y + h / 2, active, active ? t.controlActiveInk : t.softButtonDim);
 
   state.filterButton = { x, y, w, h };
 }
@@ -630,12 +1021,14 @@ function drawShareButton(x, y, compact) {
   const h = compact ? 32 : 34;
   const w = measureShareButtonWidth(compact);
   const copied = performance.now() < state.shareCopiedUntil;
-  const label = copied ? "Copied" : "Share";
+  const active = state.sharePopOpen || copied;
+  const label = copied ? "Copied" : "Share view";
+  const t = T();
 
-  drawSoftButton(x, y, w, h, copied);
+  drawSoftButton(x, y, w, h, active);
 
-  drawShareGlyph(x + 18, y + h / 2, copied ? "#ffffff" : "rgba(17, 24, 39, 0.6)");
-  ctx.fillStyle = copied ? "#ffffff" : "rgba(17, 24, 39, 0.72)";
+  drawShareGlyph(x + 18, y + h / 2, active ? t.controlActiveInk : t.softButtonDim);
+  ctx.fillStyle = active ? t.controlActiveInk : t.softButtonInk;
   ctx.font = `600 ${compact ? 12 : 13}px Inter, system-ui, sans-serif`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
@@ -645,20 +1038,21 @@ function drawShareButton(x, y, compact) {
 }
 
 function measureShareButtonWidth(compact) {
-  return compact ? 86 : 92;
+  return compact ? 112 : 122;
 }
 
 function drawSoftButton(x, y, w, h, active) {
+  const t = T();
   ctx.save();
-  ctx.shadowColor = "rgba(15, 23, 42, 0.05)";
+  ctx.shadowColor = t.softButtonShadow;
   ctx.shadowBlur = 12;
   ctx.shadowOffsetY = 2;
   roundedRect(x, y, w, h, h / 2);
-  ctx.fillStyle = active ? "#0b1220" : "#ffffff";
+  ctx.fillStyle = active ? t.controlActiveBg : t.controlBg;
   ctx.fill();
   ctx.restore();
   roundedRect(x, y, w, h, h / 2);
-  ctx.strokeStyle = active ? "rgba(11, 18, 32, 0.92)" : "rgba(17, 24, 39, 0.08)";
+  ctx.strokeStyle = active ? t.softButtonActiveBorder : t.softButtonBorder;
   ctx.lineWidth = 1;
   ctx.stroke();
 }
@@ -690,14 +1084,15 @@ function drawCompactFilterPanel(layout, y) {
   state.filterPanel = { x, y, w, h };
   shadowedPanel(x, y, w, h, 14);
 
+  const t = T();
   ctx.save();
-  ctx.fillStyle = "rgba(17, 24, 39, 0.42)";
+  ctx.fillStyle = t.sectionLabel;
   ctx.font = "600 10px Inter, system-ui, sans-serif";
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillText("LABS", x + 16, y + 22);
   drawLabToggles(x + 16, y + 48, true);
-  ctx.fillStyle = "rgba(17, 24, 39, 0.42)";
+  ctx.fillStyle = t.sectionLabel;
   ctx.font = "600 10px Inter, system-ui, sans-serif";
   ctx.fillText("MODELS", x + 16, y + 82);
   drawCohortToggles(x + 16, y + 106, true);
@@ -727,18 +1122,19 @@ function drawChevron(x, y, open, color) {
 function drawMetricControls(layout) {
   const { compact, fontSize, items, x, y, w, h } = layout;
   const activeIndex = items.findIndex((item) => item.id === state.metric);
+  const t = T();
 
   ctx.save();
-  ctx.shadowColor = "rgba(15, 23, 42, 0.05)";
+  ctx.shadowColor = t.controlShadow;
   ctx.shadowBlur = 12;
   ctx.shadowOffsetY = 2;
   roundedRect(x, y, w, h, h / 2);
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = t.controlBg;
   ctx.fill();
   ctx.restore();
 
   roundedRect(x, y, w, h, h / 2);
-  ctx.strokeStyle = "rgba(17, 24, 39, 0.08)";
+  ctx.strokeStyle = t.controlBorder;
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -752,15 +1148,15 @@ function drawMetricControls(layout) {
     const adjacentToActive = index === activeIndex + 1 || index === activeIndex - 1;
     if (active) {
       ctx.save();
-      ctx.shadowColor = "rgba(15, 23, 42, 0.18)";
+      ctx.shadowColor = t.controlActiveShadow;
       ctx.shadowBlur = 6;
       ctx.shadowOffsetY = 1;
       roundedRect(item.x + 2, item.y + 2, item.w - 4, item.h - 4, item.h / 2 - 2);
-      ctx.fillStyle = "#0b1220";
+      ctx.fillStyle = t.controlActiveBg;
       ctx.fill();
       ctx.restore();
     } else if (index > 0 && !adjacentToActive) {
-      ctx.strokeStyle = "rgba(17, 24, 39, 0.07)";
+      ctx.strokeStyle = t.controlDivider;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(item.x - 1, item.y + 8);
@@ -768,7 +1164,7 @@ function drawMetricControls(layout) {
       ctx.stroke();
     }
 
-    ctx.fillStyle = active ? "#ffffff" : "rgba(17, 24, 39, 0.68)";
+    ctx.fillStyle = active ? t.controlActiveInk : t.controlInk;
     ctx.fillText(metricOptions[index].label, item.x + item.w / 2, item.y + item.h / 2 + 0.5);
     state.controls.push(item);
   });
@@ -778,10 +1174,11 @@ function drawMetricControls(layout) {
 
 function drawPlotSurface(layout) {
   const { chart } = layout;
+  const t = T();
   ctx.save();
-  ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+  ctx.fillStyle = t.surface;
   ctx.fillRect(chart.x, chart.y, chart.w, chart.h);
-  ctx.strokeStyle = "rgba(17, 24, 39, 0.06)";
+  ctx.strokeStyle = t.plotBorder;
   ctx.lineWidth = 1;
   ctx.strokeRect(chart.x + 0.5, chart.y + 0.5, chart.w, chart.h);
   ctx.restore();
@@ -789,6 +1186,7 @@ function drawPlotSurface(layout) {
 
 function drawAxes(layout, scales) {
   const { chart, compact } = layout;
+  const t = T();
   const yTicks = pricing.getLogTicks(scales.yMin, scales.yMax);
   const years = [2023, 2024, 2025, 2026];
 
@@ -800,12 +1198,12 @@ function drawAxes(layout, scales) {
 
   yTicks.forEach((tick) => {
     const y = scales.y(tick);
-    ctx.strokeStyle = tick === 1 ? "rgba(17, 24, 39, 0.18)" : "rgba(17, 24, 39, 0.075)";
+    ctx.strokeStyle = tick === 1 ? t.chartGridStrong : t.chartGrid;
     ctx.beginPath();
     ctx.moveTo(chart.x, y);
     ctx.lineTo(chart.x + chart.w, y);
     ctx.stroke();
-    ctx.fillStyle = "rgba(17, 24, 39, 0.55)";
+    ctx.fillStyle = t.axisInk;
     ctx.fillText(formatAxisMoney(tick), chart.x - 10, y);
   });
 
@@ -814,12 +1212,12 @@ function drawAxes(layout, scales) {
   years.forEach((year) => {
     const x = scales.x(new Date(`${year}-01-01T00:00:00Z`).getTime());
     if (x < chart.x || x > chart.x + chart.w) return;
-    ctx.strokeStyle = "rgba(17, 24, 39, 0.075)";
+    ctx.strokeStyle = t.chartGrid;
     ctx.beginPath();
     ctx.moveTo(x, chart.y);
     ctx.lineTo(x, chart.y + chart.h);
     ctx.stroke();
-    ctx.fillStyle = "rgba(17, 24, 39, 0.54)";
+    ctx.fillStyle = t.yearInk;
     ctx.fillText(String(year), x, chart.y + chart.h + 14);
   });
 
@@ -827,7 +1225,7 @@ function drawAxes(layout, scales) {
     ctx.save();
     ctx.translate(28, chart.y + chart.h / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillStyle = "rgba(17, 24, 39, 0.58)";
+    ctx.fillStyle = t.axisLabelInk;
     ctx.textAlign = "center";
     ctx.font = "12px Inter, system-ui, sans-serif";
     ctx.fillText(pricing.metricAxisLabel(state.metric), 0, 0);
@@ -858,7 +1256,9 @@ function drawLines(layout, scales, drawnPoints, now) {
       y: scales.y(metricValue(point))
     }));
 
-    drawSeriesPath(path, series.dash, withAlpha("#6b7280", 0.24 * alphaProgress), layout.compact ? 1.7 : 2.1);
+    const t = T();
+    const [er, eg, eb] = t.extendedSeriesPath;
+    drawSeriesPath(path, series.dash, `rgba(${er}, ${eg}, ${eb}, ${0.24 * alphaProgress})`, layout.compact ? 1.7 : 2.1);
 
     ctx.save();
     ctx.beginPath();
@@ -870,7 +1270,7 @@ function drawLines(layout, scales, drawnPoints, now) {
     for (const item of path.filter((item) => !item.point.extended)) {
       drawnPoints.push({ ...item, series });
       const inRange = item.x >= startX - 0.5 && item.x <= endX + 0.5;
-      const color = inRange ? series.color : "rgba(107, 114, 128, 0.72)";
+      const color = inRange ? series.color : t.extendedSeries;
       drawPointRing(item.x, item.y, layout.compact ? 3.4 : 4.2, color);
     }
   }
@@ -895,7 +1295,7 @@ function drawPointRing(x, y, radius, color) {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.lineWidth = 3.4;
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+  ctx.strokeStyle = T().ringRim;
   ctx.stroke();
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -938,7 +1338,7 @@ function drawSeriesLabels(layout, scales) {
     ctx.lineTo(textX - 7, label.y);
     ctx.stroke();
 
-    ctx.fillStyle = "rgba(17, 24, 39, 0.76)";
+    ctx.fillStyle = T().seriesLabelInk;
     ctx.fillText(label.series.name, textX, label.y);
   }
   ctx.restore();
@@ -983,7 +1383,7 @@ function drawFullBubble(layout, stats, color, midX) {
   const bubbleY = chart.y + 12;
   const bubbleAnchorX = clamp(midX, bubbleX + 20, bubbleX + bubbleW - 20);
 
-  ctx.strokeStyle = "rgba(17, 24, 39, 0.16)";
+  ctx.strokeStyle = T().bubbleConnector;
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(bubbleAnchorX, bubbleY);
@@ -1000,6 +1400,7 @@ function drawFullBubble(layout, stats, color, midX) {
 
 function drawMinimizedBubble(layout, stats, color, midX) {
   const { chart, compact } = layout;
+  const t = T();
   const fontSize = compact ? 11.5 : 12.5;
   const pillH = compact ? 28 : 32;
   const pillPad = compact ? 22 : 24;
@@ -1014,18 +1415,18 @@ function drawMinimizedBubble(layout, stats, color, midX) {
 
   ctx.save();
   ctx.globalAlpha = alpha;
-  ctx.shadowColor = `rgba(15, 23, 42, ${hovered ? 0.09 : 0.04})`;
+  ctx.shadowColor = t.panelShadow;
   ctx.shadowBlur = hovered ? 22 : 12;
   ctx.shadowOffsetY = hovered ? 6 : 3;
   roundedRect(pillX, pillY, pillW, pillH, pillH / 2);
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = t.panel;
   ctx.fill();
   ctx.restore();
 
   ctx.save();
   ctx.globalAlpha = alpha;
   roundedRect(pillX, pillY, pillW, pillH, pillH / 2);
-  ctx.strokeStyle = "rgba(17, 24, 39, 0.07)";
+  ctx.strokeStyle = t.panelBorder;
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -1039,7 +1440,7 @@ function drawMinimizedBubble(layout, stats, color, midX) {
     stats.verdict === "flat" ? "#422006" : "#ffffff",
     fontSize
   );
-  drawChevron(pillX + verdictW + 18, pillY + pillH / 2, false, "rgba(17, 24, 39, 0.5)");
+  drawChevron(pillX + verdictW + 18, pillY + pillH / 2, false, t.bodyInkSoft);
   ctx.restore();
 
   state.bubblePanel = { x: pillX, y: pillY, w: pillW, h: pillH };
@@ -1051,6 +1452,7 @@ function drawBubbleMinimizeButton(rightX, cy) {
   const labelFont = "500 9.5px Inter, system-ui, sans-serif";
   const iconW = 9;
   const gap = 5;
+  const t = T();
 
   ctx.save();
   ctx.font = labelFont;
@@ -1062,7 +1464,7 @@ function drawBubbleMinimizeButton(rightX, cy) {
   const hitPadX = 6;
   const hitPadY = 8;
   const hovered = isPointerInRect(startX - hitPadX, cy - hitPadY, contentW + hitPadX * 2, hitPadY * 2);
-  const tint = hovered ? "rgba(17, 24, 39, 0.85)" : "rgba(17, 24, 39, 0.42)";
+  const tint = hovered ? t.minimizeInkActive : t.minimizeInk;
 
   ctx.save();
   ctx.font = labelFont;
@@ -1095,7 +1497,7 @@ function isPointerInRect(x, y, w, h) {
 
 function drawComparisonCursorLine(layout, x) {
   const { chart } = layout;
-  ctx.strokeStyle = "rgba(17, 24, 39, 0.42)";
+  ctx.strokeStyle = T().cursorLine;
   ctx.lineWidth = 1;
   ctx.setLineDash([4, 5]);
   ctx.beginPath();
@@ -1107,25 +1509,26 @@ function drawComparisonCursorLine(layout, x) {
 
 function drawComparisonHandle(layout, x) {
   const { chart, compact } = layout;
+  const t = T();
   const handleY = chart.y + chart.h / 2;
   const handleW = compact ? 20 : 18;
   const handleH = compact ? 56 : 52;
 
   ctx.save();
-  ctx.shadowColor = "rgba(15, 23, 42, 0.12)";
+  ctx.shadowColor = t.handleShadow;
   ctx.shadowBlur = 10;
   ctx.shadowOffsetY = 2;
   roundedRect(x - handleW / 2, handleY - handleH / 2, handleW, handleH, handleW / 2);
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = t.handleFill;
   ctx.fill();
   ctx.restore();
 
   roundedRect(x - handleW / 2, handleY - handleH / 2, handleW, handleH, handleW / 2);
-  ctx.strokeStyle = "rgba(17, 24, 39, 0.12)";
+  ctx.strokeStyle = t.handleBorder;
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  ctx.strokeStyle = "rgba(17, 24, 39, 0.36)";
+  ctx.strokeStyle = t.handleGrip;
   ctx.lineWidth = 1.2;
   ctx.lineCap = "round";
   for (const offset of [-2.5, 2.5]) {
@@ -1148,7 +1551,7 @@ function drawComparisonNarrative(x, y, w, stats, compact, color, sentenceLines) 
   ctx.textBaseline = "middle";
   drawVerdictPill(x + (w - pillW) / 2, y, pillW, pillH, stats.pillText, color, pillTextColor, fontSize);
 
-  ctx.fillStyle = "rgba(17, 24, 39, 0.66)";
+  ctx.fillStyle = T().bodyInkSoft;
   ctx.textAlign = "center";
   ctx.font = `${compact ? 11 : 12}px Inter, system-ui, sans-serif`;
   ctx.textBaseline = "top";
@@ -1216,16 +1619,19 @@ function drawComparisonTable(x, y, w, stats, compact) {
   const afterX = x + w - (compact ? 20 : 22);
   const beforeX = afterX - (compact ? 70 : 80);
   const rowH = compact ? 18 : 20;
+  const t = T();
+  const upClr = state.theme === "dark" ? "#fca5a5" : "#b91c1c";
+  const downClr = state.theme === "dark" ? "#4ade80" : "#15803d";
 
   ctx.save();
   ctx.textBaseline = "middle";
   ctx.font = `600 ${compact ? 9 : 10}px Inter, system-ui, sans-serif`;
-  ctx.fillStyle = "rgba(17, 24, 39, 0.4)";
+  ctx.fillStyle = t.bodyInkSofter;
   ctx.textAlign = "right";
   ctx.fillText("BEFORE", beforeX, y);
   ctx.fillText("AFTER", afterX, y);
 
-  ctx.strokeStyle = "rgba(17, 24, 39, 0.06)";
+  ctx.strokeStyle = t.hoverRowDivider;
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(x + (compact ? 18 : 20), y + rowH / 2 + 1);
@@ -1235,21 +1641,21 @@ function drawComparisonTable(x, y, w, stats, compact) {
   stats.groups.forEach((group, index) => {
     const rowY = y + rowH * (index + 1) + 2;
     ctx.font = `600 ${compact ? 10.5 : 11.5}px Inter, system-ui, sans-serif`;
-    ctx.fillStyle = "rgba(17, 24, 39, 0.82)";
+    ctx.fillStyle = t.hoverValueInk;
     ctx.textAlign = "left";
     ctx.fillText(group.label, labelX, rowY);
 
     ctx.font = `${compact ? 10.5 : 11.5}px Inter, system-ui, sans-serif`;
     ctx.textAlign = "right";
-    ctx.fillStyle = "rgba(17, 24, 39, 0.56)";
+    ctx.fillStyle = t.bodyInkSoft;
     ctx.fillText(formatCompactMoney(group.startAverage), beforeX, rowY);
 
     ctx.font = `600 ${compact ? 10.5 : 11.5}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = group.changePercent < -0.5
-      ? "#15803d"
+      ? downClr
       : group.changePercent > 0.5
-        ? "#b91c1c"
-        : "rgba(17, 24, 39, 0.72)";
+        ? upClr
+        : t.bodyInkSoft;
     ctx.fillText(formatCompactMoney(group.endAverage), afterX, rowY);
   });
 
@@ -1288,7 +1694,7 @@ function drawLabToggles(x, y, compact) {
       h: 36
     });
 
-    ctx.fillStyle = enabled ? "rgba(17, 24, 39, 0.74)" : "rgba(107, 114, 128, 0.48)";
+    ctx.fillStyle = enabled ? T().checkOnInk : T().checkOffInk;
     ctx.fillText(lab.name, labelX, y);
     x += itemW + gap;
   });
@@ -1323,7 +1729,7 @@ function drawCohortToggles(x, y, compact) {
     const itemW = measureCohortToggleWidth(cohort, compact);
     const enabled = isCohortEnabled(cohort.id);
     drawCheckToggle(itemX, y - checkSize / 2, checkSize, enabled, cohort.color);
-    ctx.fillStyle = enabled ? "rgba(17, 24, 39, 0.76)" : "rgba(107, 114, 128, 0.48)";
+    ctx.fillStyle = enabled ? T().cohortOnInk : T().checkOffInk;
     ctx.fillText(cohort.label, itemX + checkSize + 8, y);
     state.cohortToggles.push({
       cohortId: cohort.id,
@@ -1351,11 +1757,12 @@ function measureCohortToggleWidth(cohort, compact) {
 }
 
 function drawCheckToggle(x, y, size, enabled, color) {
+  const t = T();
   ctx.save();
   roundedRect(x, y, size, size, 5);
-  ctx.fillStyle = enabled ? color : "#ffffff";
+  ctx.fillStyle = enabled ? color : t.checkBg;
   ctx.fill();
-  ctx.strokeStyle = enabled ? withAlpha(color, 0.92) : "rgba(17, 24, 39, 0.14)";
+  ctx.strokeStyle = enabled ? withAlpha(color, 0.92) : t.checkBorder;
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -1379,7 +1786,7 @@ function drawFootnotes(layout) {
   if (compact) return;
 
   ctx.save();
-  ctx.fillStyle = "rgba(17, 24, 39, 0.5)";
+  ctx.fillStyle = T().bodyInkSofter;
   ctx.font = "11px Inter, system-ui, sans-serif";
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
@@ -1407,8 +1814,9 @@ function drawHover(layout, drawnPoints) {
   if (!nearest || nearestDistance > 42) return;
   state.hover = nearest;
 
+  const tHov = T();
   ctx.save();
-  ctx.strokeStyle = "rgba(17, 24, 39, 0.14)";
+  ctx.strokeStyle = tHov.hoverLine;
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(nearest.x, layout.chart.y);
@@ -1467,17 +1875,17 @@ function drawHover(layout, drawnPoints) {
 
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-  ctx.fillStyle = "#111827";
+  ctx.fillStyle = tHov.hoverValueInk;
   ctx.font = titleFont;
   ctx.fillText(point.model, boxX + padX + 32, boxY + padY);
-  ctx.fillStyle = "rgba(17, 24, 39, 0.62)";
+  ctx.fillStyle = tHov.hoverMetaInk;
   ctx.font = metaFont;
   ctx.fillText(`${point.labInfo.name} - ${formatDate(point.date)}`, boxX + padX + 32, boxY + padY + 18);
 
   roundedRect(tableX, tableY, tableW, tableH, 11);
-  ctx.fillStyle = "rgba(247, 248, 251, 0.95)";
+  ctx.fillStyle = tHov.hoverTableBg;
   ctx.fill();
-  ctx.strokeStyle = "rgba(17, 24, 39, 0.08)";
+  ctx.strokeStyle = tHov.hoverTableBorder;
   ctx.stroke();
 
   ctx.textBaseline = "middle";
@@ -1493,7 +1901,7 @@ function drawHover(layout, drawnPoints) {
     }
 
     if (index > 0) {
-      ctx.strokeStyle = "rgba(17, 24, 39, 0.06)";
+      ctx.strokeStyle = tHov.hoverRowDivider;
       ctx.beginPath();
       ctx.moveTo(tableX + 12, rowY);
       ctx.lineTo(tableX + tableW - 12, rowY);
@@ -1501,26 +1909,26 @@ function drawHover(layout, drawnPoints) {
     }
 
     ctx.textAlign = "left";
-    ctx.fillStyle = "rgba(17, 24, 39, 0.6)";
+    ctx.fillStyle = tHov.hoverLabelInk;
     ctx.font = labelFont;
     ctx.fillText(row.label, labelX, centerY + 0.5);
 
     ctx.textAlign = "right";
-    ctx.fillStyle = row.active ? point.seriesInfo.color : "#111827";
+    ctx.fillStyle = row.active ? point.seriesInfo.color : tHov.hoverValueInk;
     ctx.font = valueFont;
     ctx.fillText(row.value, valueX, centerY + 0.5);
   }
 
   if (noteLines.length) {
     let textY = tableY + tableH + 12;
-    ctx.strokeStyle = "rgba(17, 24, 39, 0.08)";
+    ctx.strokeStyle = tHov.hoverTableBorder;
     ctx.beginPath();
     ctx.moveTo(boxX + padX, textY - 6);
     ctx.lineTo(boxX + boxW - padX, textY - 6);
     ctx.stroke();
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    ctx.fillStyle = "rgba(17, 24, 39, 0.54)";
+    ctx.fillStyle = tHov.hoverNoteInk;
     ctx.font = noteFont;
     for (const line of noteLines) {
       ctx.fillText(line, boxX + padX, textY);
@@ -1606,6 +2014,7 @@ function getUiAvoidRects() {
     state.shareButton,
     state.filterButton,
     state.filterPanel,
+    state.themeButton,
     state.bubbleMinimized ? null : state.bubblePanel
   ].filter(Boolean);
 }
@@ -1639,6 +2048,7 @@ function getPointerCursor(pointer) {
     getCohortToggleAt(pointer.x, pointer.y) ||
     getShareButtonAt(pointer.x, pointer.y) ||
     getFilterButtonAt(pointer.x, pointer.y) ||
+    getThemeButtonAt(pointer.x, pointer.y) ||
     getControlAt(pointer.x, pointer.y) ||
     getBubbleMinimizeAt(pointer.x, pointer.y) ||
     (state.bubbleMinimized && getBubblePanelAt(pointer.x, pointer.y))
@@ -1843,11 +2253,12 @@ function getLatestAtOrBefore(points, dateValue) {
 }
 
 function drawError(error) {
+  const t = T();
   ctx.save();
   ctx.clearRect(0, 0, state.width, state.height);
-  ctx.fillStyle = "#f7f8fb";
+  ctx.fillStyle = t.bg1;
   ctx.fillRect(0, 0, state.width, state.height);
-  ctx.fillStyle = "#991b1b";
+  ctx.fillStyle = state.theme === "dark" ? "#fca5a5" : "#991b1b";
   ctx.font = "16px Inter, system-ui, sans-serif";
   ctx.fillText(error.message || "Unable to load chart.", 24, 32);
   ctx.restore();
@@ -1903,16 +2314,17 @@ function roundedRect(x, y, w, h, r) {
 }
 
 function shadowedPanel(x, y, w, h, r) {
+  const t = T();
   ctx.save();
-  ctx.shadowColor = "rgba(15, 23, 42, 0.09)";
+  ctx.shadowColor = t.panelShadow;
   ctx.shadowBlur = 22;
   ctx.shadowOffsetY = 6;
   roundedRect(x, y, w, h, r);
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = t.panel;
   ctx.fill();
   ctx.restore();
   roundedRect(x, y, w, h, r);
-  ctx.strokeStyle = "rgba(17, 24, 39, 0.06)";
+  ctx.strokeStyle = t.panelBorder;
   ctx.lineWidth = 1;
   ctx.stroke();
 }
@@ -1960,4 +2372,57 @@ function withAlpha(hex, alpha) {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function bindEarlyAccessForm() {
+  const bar = document.getElementById("sa-bar");
+  const form = document.getElementById("sa-bar-form");
+  if (!form || !bar) return;
+  const submit = document.getElementById("sa-bar-submit");
+  const label = submit?.querySelector(".sa-bar-submit-label");
+  const arrow = submit?.querySelector(".sa-bar-arrow");
+  const spinner = submit?.querySelector(".sa-bar-spinner");
+  const status = document.getElementById("sa-bar-status");
+  const nameInput = document.getElementById("sa-bar-name");
+  const emailInput = document.getElementById("sa-bar-email");
+
+  function setStatus(text, tone = "") {
+    if (!status) return;
+    status.textContent = text;
+    if (tone) status.setAttribute("data-tone", tone);
+    else status.removeAttribute("data-tone");
+  }
+
+  function setBusy(busy) {
+    if (!submit) return;
+    submit.disabled = busy;
+    if (label) label.style.display = busy ? "none" : "";
+    if (arrow) arrow.style.display = busy ? "none" : "";
+    if (spinner) spinner.style.display = busy ? "" : "none";
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const name = (nameInput?.value || "").trim();
+    const email = (emailInput?.value || "").trim();
+    if (!name || !email) return;
+    setBusy(true);
+    setStatus("");
+    try {
+      const response = await fetch("/api/early-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email })
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Could not submit");
+      }
+      bar.classList.add("sa-bar--success");
+      setStatus("You're on the list — we'll be in touch.", "ok");
+    } catch (error) {
+      setStatus(error.message || "Something went wrong.", "err");
+      setBusy(false);
+    }
+  });
 }
