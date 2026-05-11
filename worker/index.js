@@ -72,7 +72,8 @@ async function handleDocument(request, env) {
   if (!contentType.includes("text/html")) return assetResponse;
 
   const url = new URL(request.url);
-  const view = createViewStateFromSearchParams(DATA, url.searchParams);
+  const cleanParams = normalizeAmpParams(url.searchParams);
+  const view = createViewStateFromSearchParams(DATA, cleanParams);
   const params = serializeViewState(DATA, view);
   const ogUrl = new URL("/api/og", url.origin);
   ogUrl.search = params.toString();
@@ -80,9 +81,9 @@ async function handleDocument(request, env) {
   pageUrl.search = params.toString();
   const html = await assetResponse.text();
   const nextHtml = html
-    .replace(/<meta property="og:image" content="[^"]*" \/>/, `<meta property="og:image" content="${escapeHtml(ogUrl.toString())}" />`)
-    .replace(/<meta name="twitter:image" content="[^"]*" \/>/, `<meta name="twitter:image" content="${escapeHtml(ogUrl.toString())}" />`)
-    .replace("</head>", `<meta property="og:url" content="${escapeHtml(pageUrl.toString())}" />\n  </head>`);
+    .replace(/<meta property="og:image" content="[^"]*" \/>/, `<meta property="og:image" content="${escapeAttr(ogUrl.toString())}" />`)
+    .replace(/<meta name="twitter:image" content="[^"]*" \/>/, `<meta name="twitter:image" content="${escapeAttr(ogUrl.toString())}" />`)
+    .replace("</head>", `<meta property="og:url" content="${escapeAttr(pageUrl.toString())}" />\n  </head>`);
 
   return new Response(nextHtml, {
     status: assetResponse.status,
@@ -93,11 +94,20 @@ async function handleDocument(request, env) {
   });
 }
 
+function normalizeAmpParams(searchParams) {
+  const out = new URLSearchParams();
+  for (const [key, value] of searchParams.entries()) {
+    out.append(key.startsWith("amp;") ? key.slice(4) : key, value);
+  }
+  return out;
+}
+
 async function handleOgImage(request, env, ctx) {
   const url = new URL(request.url);
-  const view = createViewStateFromSearchParams(DATA, url.searchParams);
+  const cleanParams = normalizeAmpParams(url.searchParams);
+  const view = createViewStateFromSearchParams(DATA, cleanParams);
   const params = serializeViewState(DATA, view);
-  const cacheKey = `og/v11/${await sha256(params.toString())}.png`;
+  const cacheKey = `og/v12/${await sha256(params.toString())}.png`;
   const headers = {
     "content-type": "image/png",
     "cache-control": OG_CACHE_CONTROL,
@@ -211,6 +221,6 @@ async function sha256(value) {
     .slice(0, 32);
 }
 
-function escapeHtml(value) {
-  return String(value).replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+function escapeAttr(value) {
+  return String(value).replaceAll('"', "&quot;");
 }
