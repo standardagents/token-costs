@@ -120,7 +120,7 @@ async function handleOgImage(request, env, ctx) {
   }
 
   const svg = renderOgSvg(DATA, view);
-  const png = await svgToPng(svg, request.url);
+  const png = await svgToPng(svg, request.url, env);
 
   if (env.OG_IMAGES) {
     const expiresAt = new Date(Date.now() + OG_TTL_SECONDS * 1000).toISOString();
@@ -144,9 +144,9 @@ async function handleOgImage(request, env, ctx) {
   });
 }
 
-async function svgToPng(svg, requestUrl) {
+async function svgToPng(svg, requestUrl, env) {
   await ensureResvg();
-  const fontBuffers = await loadFontBuffers(requestUrl);
+  const fontBuffers = await loadFontBuffers(requestUrl, env);
   const renderer = new Resvg(svg, {
     fitTo: { mode: "original" },
     font: {
@@ -162,11 +162,28 @@ async function svgToPng(svg, requestUrl) {
   }
 }
 
-async function loadFontBuffers(requestUrl) {
+async function loadFontBuffers(requestUrl, env) {
   if (!fontBuffersReady) {
-    fontBuffersReady = fetch(new URL(interVariableUrl, requestUrl))
-      .then((response) => response.arrayBuffer())
-      .then((buffer) => [new Uint8Array(buffer)]);
+    fontBuffersReady = (async () => {
+      const fontUrl = new URL(interVariableUrl, requestUrl);
+      let response;
+      if (env?.ASSETS) {
+        response = await env.ASSETS.fetch(new Request(fontUrl.toString()));
+      } else {
+        response = await fetch(fontUrl);
+      }
+      if (!response.ok) {
+        throw new Error(`Font fetch failed: ${response.status} ${fontUrl.pathname}`);
+      }
+      const buffer = await response.arrayBuffer();
+      if (!buffer.byteLength) {
+        throw new Error(`Font buffer empty for ${fontUrl.pathname}`);
+      }
+      return [new Uint8Array(buffer)];
+    })().catch((error) => {
+      fontBuffersReady = null;
+      throw error;
+    });
   }
   return fontBuffersReady;
 }
