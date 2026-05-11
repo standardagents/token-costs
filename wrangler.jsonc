@@ -3,6 +3,9 @@
   "name": "token-costs",
   "main": "worker/index.js",
   "compatibility_date": "2026-05-08",
+  "routes": [
+    { "pattern": "token-costs.standardagents.ai", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./dist/client",
     "binding": "ASSETS",
