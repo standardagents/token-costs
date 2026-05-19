@@ -25,6 +25,7 @@ Artificial Analysis intelligence mappings are stored in `data/model-intelligence
 - `Claude 3.5 Haiku` launched at a higher price and Anthropic later revised its public price to $0.80 input / $4 output on 2024-12-03. Both price events are represented.
 - Some Google 1.5 pricing was originally communicated across Gemini API and Vertex AI pages with modality/context tiers. The data uses the Gemini API token price where available and records the lower-context text tier.
 - `Gemini 2.5 Flash` preview pricing and the subsequent stable-release price update are both represented because the public input/output rates changed before the next Flash release.
+- `Gemini 3.5 Flash` is represented for the May 19, 2026 launch. Google announced `Gemini 3.5 Pro` for the following month, but no public API price was available as of this update.
 
 ## Primary Provider Links
 
@@ -42,5 +43,6 @@ Artificial Analysis intelligence mappings are stored in `data/model-intelligence
 - Google Gemini 3: https://blog.google/products-and-platforms/products/gemini/gemini-3/
 - Google Gemini 3 Flash: https://blog.google/products/gemini/gemini-3-flash/
 - Google Gemini 3.1 Flash-Lite: https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-lite
+- Google Gemini 3.5: https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/
 
 Full per-point pricing source IDs and URLs are embedded in `data/model-prices.json`. Full per-model Artificial Analysis source URLs are embedded in `data/model-intelligence.json`.

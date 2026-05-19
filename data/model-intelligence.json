@@ -331,6 +331,13 @@
       "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-5",
       "sourceReleased": "April 23, 2026",
       "resolution": "exact"
+    },
+    "Gemini 3.5 Flash": {
+      "score": 55,
+      "sourceModel": "Gemini 3.5 Flash",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-3-5-flash/",
+      "sourceReleased": "May 19, 2026",
+      "resolution": "exact"
     }
   }
 }

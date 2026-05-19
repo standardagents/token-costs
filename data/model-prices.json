@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Major AI lab API token prices over time",
-    "asOf": "2026-05-08",
+    "asOf": "2026-05-19",
     "currency": "USD",
     "unit": "per 1M tokens",
     "defaultMetric": "outputUsdPer1M",
@@ -162,6 +162,7 @@
     "google-gemini3-flash": "https://blog.google/products/gemini/gemini-3-flash/",
     "google-gemini31-pro": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro",
     "google-gemini31-flash-lite": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-flash-lite",
+    "google-gemini35": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/",
     "google-pricing": "https://ai.google.dev/gemini-api/docs/pricing"
   },
   "points": [
@@ -692,6 +693,19 @@
         "openai-gpt55",
         "openai-pricing"
       ]
+    },
+    {
+      "date": "2026-05-19",
+      "lab": "google",
+      "series": "google-flash",
+      "model": "Gemini 3.5 Flash",
+      "inputUsdPer1M": 1.5,
+      "outputUsdPer1M": 9,
+      "sourceIds": [
+        "google-gemini35",
+        "google-pricing"
+      ],
+      "note": "Uses standard Gemini API text pricing. Google announced Gemini 3.5 Pro for next month, but no public API price was available at this update."
     }
   ]
 }
