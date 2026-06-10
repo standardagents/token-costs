@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Major AI lab API token prices over time",
-    "asOf": "2026-05-19",
+    "asOf": "2026-06-09",
     "currency": "USD",
     "unit": "per 1M tokens",
     "defaultMetric": "outputUsdPer1M",
@@ -150,6 +150,8 @@
     "anthropic-opus46": "https://www.anthropic.com/news/claude-opus-4-6",
     "anthropic-sonnet46": "https://www.anthropic.com/claude/sonnet",
     "anthropic-opus47": "https://www.anthropic.com/news/claude-opus-4-7",
+    "anthropic-opus48": "https://www.anthropic.com/news/claude-opus-4-8",
+    "anthropic-fable5": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
     "google-io-2024": "https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/",
     "google-developer-may-2024": "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-gemma-developer-updates-may-2024/",
     "google-gemini15-flash-price-drop": "https://developers.googleblog.com/en/gemini-15-flash-updates-google-ai-studio-gemini-api/",
@@ -706,6 +708,30 @@
         "google-pricing"
       ],
       "note": "Uses standard Gemini API text pricing. Google announced Gemini 3.5 Pro for next month, but no public API price was available at this update."
+    },
+    {
+      "date": "2026-05-28",
+      "lab": "anthropic",
+      "series": "anthropic-opus",
+      "model": "Claude Opus 4.8",
+      "inputUsdPer1M": 5,
+      "outputUsdPer1M": 25,
+      "sourceIds": [
+        "anthropic-opus48"
+      ],
+      "note": "Uses regular API pricing; Anthropic also announced a separate fast mode at $10/$50 per 1M tokens."
+    },
+    {
+      "date": "2026-06-09",
+      "lab": "anthropic",
+      "series": "anthropic-opus",
+      "model": "Claude Fable 5",
+      "inputUsdPer1M": 10,
+      "outputUsdPer1M": 50,
+      "sourceIds": [
+        "anthropic-fable5"
+      ],
+      "note": "First public Mythos-class Claude model; Anthropic lists API availability as claude-fable-5."
     }
   ]
 }

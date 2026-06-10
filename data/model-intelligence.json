@@ -338,6 +338,21 @@
       "sourceUrl": "https://artificialanalysis.ai/models/gemini-3-5-flash/",
       "sourceReleased": "May 19, 2026",
       "resolution": "exact"
+    },
+    "Claude Opus 4.8": {
+      "score": 61.4,
+      "sourceModel": "Claude Opus 4.8 (Adaptive Reasoning, Max Effort)",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-opus-4-8",
+      "sourceReleased": "May 28, 2026",
+      "resolution": "exact"
+    },
+    "Claude Fable 5": {
+      "score": 64.9,
+      "sourceModel": "Claude Fable 5 (Adaptive Reasoning, Max Effort, Opus 4.8 Fallback)",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-fable-5",
+      "sourceReleased": "June 9, 2026",
+      "resolution": "exact",
+      "note": "Artificial Analysis reports the score with Anthropic's Opus 4.8 fallback mechanism enabled."
     }
   }
 }

@@ -1,0 +1,15 @@
+{
+  "source": "codex-hook",
+  "dmuxPaneId": "dmux-1781103536160",
+  "tmuxPaneId": "%248",
+  "hookEventName": "Stop",
+  "turnId": "019eb21a-e7a4-73a3-a703-a573cfa81cbe",
+  "sessionId": "019eb20b-313b-7602-ac4e-66839bcd60ed",
+  "toolName": "",
+  "approvalDescription": null,
+  "dmuxStatus": "idle",
+  "lastAssistantMessage": "Added Opus 4.8 and republished.\n\nDetails:\n- `Claude Opus 4.8`, dated `2026-05-28`\n- Standard API pricing: `$5/M` input, `$25/M` output\n- AA score: `61.4`\n- Deployed Worker version: `59ac9915-e98e-42b0-86ef-09f580fbfc27`\n\nVerified live at https://token-costs.standardagents.ai/ with `200 OK`, and the deployed bundle contains both `Claude Opus 4.8` and `Claude Fable 5`.",
+  "transcriptPath": "/Users/justinschroeder/.codex/sessions/2026/06/10/rollout-2026-06-10T10-58-58-019eb20b-313b-7602-ac4e-66839bcd60ed.jsonl",
+  "cwd": "/Users/justinschroeder/Projects/are-tokens-getting-cheaper/.dmux/worktrees/anthropic-fable",
+  "timestamp": 1781104655084
+}

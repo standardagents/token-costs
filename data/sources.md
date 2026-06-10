@@ -36,6 +36,8 @@ Artificial Analysis intelligence mappings are stored in `data/model-intelligence
 - Anthropic Claude model/pricing docs and launch posts: https://docs.anthropic.com/en/docs/about-claude/models/overview
 - Anthropic Claude 3 family: https://www.anthropic.com/news/claude-3-family
 - Anthropic Claude Opus 4.7: https://www.anthropic.com/news/claude-opus-4-7
+- Anthropic Claude Opus 4.8: https://www.anthropic.com/news/claude-opus-4-8
+- Anthropic Claude Fable 5: https://www.anthropic.com/news/claude-fable-5-mythos-5
 - Google Gemini API pricing: https://ai.google.dev/gemini-api/docs/pricing
 - Google Gemini 1.5 Flash API price update: https://developers.googleblog.com/en/gemini-15-flash-updates-google-ai-studio-gemini-api/
 - Google Gemini 1.5 Flash-8B GA: https://developers.googleblog.com/en/gemini-15-flash-8b-is-now-generally-available-for-use/

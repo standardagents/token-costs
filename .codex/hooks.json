@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node '.codex/hooks/dmux-stop-hook.cjs'",
+            "timeout": 5,
+            "statusMessage": "Notifying dmux"
+          }
+        ]
+      }
+    ]
+  }
+}
