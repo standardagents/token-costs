@@ -1,7 +1,7 @@
 {
   "meta": {
     "benchmark": "Artificial Analysis Intelligence Index",
-    "asOf": "2026-05-11",
+    "asOf": "2026-06-09",
     "valueFormula": "(inputUsdPer1M + outputUsdPer1M) / intelligenceScore",
     "unit": "USD per 1M tokens per Artificial Analysis intelligence point",
     "notes": [

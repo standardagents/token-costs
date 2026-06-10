@@ -707,7 +707,7 @@
         "google-gemini35",
         "google-pricing"
       ],
-      "note": "Uses standard Gemini API text pricing. Google announced Gemini 3.5 Pro for next month, but no public API price was available at this update."
+      "note": "Uses standard Gemini API text pricing. Google announced Gemini 3.5 Pro for next month, but no public API price was available as of the June 8, 2026 update."
     },
     {
       "date": "2026-05-28",
@@ -719,7 +719,7 @@
       "sourceIds": [
         "anthropic-opus48"
       ],
-      "note": "Uses regular API pricing; Anthropic also announced a separate fast mode at $10/$50 per 1M tokens."
+      "note": "Uses regular Claude API pricing. Anthropic also lists a fast mode at $10/$50 per 1M tokens, which is outside the standard-rate basis."
     },
     {
       "date": "2026-06-09",
