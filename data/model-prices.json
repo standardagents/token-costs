@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Major AI lab API token prices over time",
-    "asOf": "2026-05-19",
+    "asOf": "2026-06-08",
     "currency": "USD",
     "unit": "per 1M tokens",
     "defaultMetric": "outputUsdPer1M",
@@ -150,6 +150,7 @@
     "anthropic-opus46": "https://www.anthropic.com/news/claude-opus-4-6",
     "anthropic-sonnet46": "https://www.anthropic.com/claude/sonnet",
     "anthropic-opus47": "https://www.anthropic.com/news/claude-opus-4-7",
+    "anthropic-opus48": "https://www.anthropic.com/news/claude-opus-4-8",
     "google-io-2024": "https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/",
     "google-developer-may-2024": "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-gemma-developer-updates-may-2024/",
     "google-gemini15-flash-price-drop": "https://developers.googleblog.com/en/gemini-15-flash-updates-google-ai-studio-gemini-api/",
@@ -705,7 +706,19 @@
         "google-gemini35",
         "google-pricing"
       ],
-      "note": "Uses standard Gemini API text pricing. Google announced Gemini 3.5 Pro for next month, but no public API price was available at this update."
+      "note": "Uses standard Gemini API text pricing. Google announced Gemini 3.5 Pro for next month, but no public API price was available as of the June 8, 2026 update."
+    },
+    {
+      "date": "2026-05-28",
+      "lab": "anthropic",
+      "series": "anthropic-opus",
+      "model": "Claude Opus 4.8",
+      "inputUsdPer1M": 5,
+      "outputUsdPer1M": 25,
+      "sourceIds": [
+        "anthropic-opus48"
+      ],
+      "note": "Uses regular Claude API pricing. Anthropic also lists a higher-priced fast mode, which is outside the standard-rate basis."
     }
   ]
 }

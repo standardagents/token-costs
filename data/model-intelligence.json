@@ -1,7 +1,7 @@
 {
   "meta": {
     "benchmark": "Artificial Analysis Intelligence Index",
-    "asOf": "2026-05-11",
+    "asOf": "2026-06-08",
     "valueFormula": "(inputUsdPer1M + outputUsdPer1M) / intelligenceScore",
     "unit": "USD per 1M tokens per Artificial Analysis intelligence point",
     "notes": [
@@ -337,6 +337,13 @@
       "sourceModel": "Gemini 3.5 Flash",
       "sourceUrl": "https://artificialanalysis.ai/models/gemini-3-5-flash/",
       "sourceReleased": "May 19, 2026",
+      "resolution": "exact"
+    },
+    "Claude Opus 4.8": {
+      "score": 61,
+      "sourceModel": "Claude Opus 4.8 (Adaptive Reasoning, Max Effort)",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-opus-4-8",
+      "sourceReleased": "May 28, 2026",
       "resolution": "exact"
     }
   }

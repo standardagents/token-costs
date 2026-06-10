@@ -888,6 +888,24 @@ function toggleTheme() {
   draw();
 }
 
+function getSeriesColor(series) {
+  if (state.theme !== "dark") return series.color;
+  if (series.id === "openai-gpt-frontier") return "#f8fafc";
+  if (series.id === "openai-gpt-mini") return "#cbd5e1";
+  if (series.id === "openai-gpt-nano") return "#94a3b8";
+  return series.color;
+}
+
+function getLabColor(lab) {
+  if (state.theme === "dark" && lab.id === "openai") return "#e2e8f0";
+  return lab.brandColor;
+}
+
+function getCohortColor(cohort) {
+  if (state.theme === "dark" && cohort.id === "frontier") return "#e2e8f0";
+  return cohort.color;
+}
+
 function getThemeButtonAt(x, y) {
   const item = state.themeButton;
   if (!item) return null;
@@ -1249,6 +1267,7 @@ function drawLines(layout, scales, drawnPoints, now) {
 
   for (const [seriesId, points] of seriesEntries) {
     const series = state.data.series.get(seriesId);
+    const seriesColor = getSeriesColor(series);
     const visiblePathPoints = pricing.getExtendedSeriesPoints(points, scales.dateMax);
     const path = visiblePathPoints.map((point) => ({
       point,
@@ -1264,13 +1283,13 @@ function drawLines(layout, scales, drawnPoints, now) {
     ctx.beginPath();
     ctx.rect(startX, layout.chart.y - 4, Math.max(0, endX - startX) + 4, layout.chart.h + 8);
     ctx.clip();
-    drawSeriesPath(path, series.dash, withAlpha(series.color, 0.86 * alphaProgress), layout.compact ? 2 : 2.6);
+    drawSeriesPath(path, series.dash, withAlpha(seriesColor, 0.86 * alphaProgress), layout.compact ? 2 : 2.6);
     ctx.restore();
 
     for (const item of path.filter((item) => !item.point.extended)) {
       drawnPoints.push({ ...item, series });
       const inRange = item.x >= startX - 0.5 && item.x <= endX + 0.5;
-      const color = inRange ? series.color : t.extendedSeries;
+      const color = inRange ? seriesColor : t.extendedSeries;
       drawPointRing(item.x, item.y, layout.compact ? 3.4 : 4.2, color);
     }
   }
@@ -1330,8 +1349,9 @@ function drawSeriesLabels(layout, scales) {
   for (const label of labels) {
     const textX = Math.min(layout.width - 166, label.x + 18);
     const sourceY = scales.y(label.value);
+    const seriesColor = getSeriesColor(label.series);
 
-    ctx.strokeStyle = withAlpha(label.series.color, 0.42);
+    ctx.strokeStyle = withAlpha(seriesColor, 0.42);
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(label.x, sourceY);
@@ -1678,9 +1698,10 @@ function drawLabToggles(x, y, compact) {
     const alpha = enabled ? 1 : 0.34;
     const checkX = x;
     const logoX = x + checkSize + (compact ? 8 : 10);
-    const color = enabled ? lab.brandColor : "#9ca3af";
+    const labColor = getLabColor(lab);
+    const color = enabled ? labColor : "#9ca3af";
 
-    drawCheckToggle(checkX, y - checkSize / 2, checkSize, enabled, lab.brandColor);
+    drawCheckToggle(checkX, y - checkSize / 2, checkSize, enabled, labColor);
     ctx.globalAlpha = alpha;
     drawTintedImage(lab.logo, logoX, y - logoSize / 2, logoSize, logoSize, color);
     ctx.globalAlpha = 1;
@@ -1728,7 +1749,7 @@ function drawCohortToggles(x, y, compact) {
     const itemX = x;
     const itemW = measureCohortToggleWidth(cohort, compact);
     const enabled = isCohortEnabled(cohort.id);
-    drawCheckToggle(itemX, y - checkSize / 2, checkSize, enabled, cohort.color);
+    drawCheckToggle(itemX, y - checkSize / 2, checkSize, enabled, getCohortColor(cohort));
     ctx.fillStyle = enabled ? T().cohortOnInk : T().checkOffInk;
     ctx.fillText(cohort.label, itemX + checkSize + 8, y);
     state.cohortToggles.push({
@@ -1767,7 +1788,7 @@ function drawCheckToggle(x, y, size, enabled, color) {
   ctx.stroke();
 
   if (enabled) {
-    ctx.strokeStyle = "#ffffff";
+    ctx.strokeStyle = getCheckMarkColor(color);
     ctx.lineWidth = Math.max(1.8, size * 0.14);
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -1815,6 +1836,7 @@ function drawHover(layout, drawnPoints) {
   state.hover = nearest;
 
   const tHov = T();
+  const seriesColor = getSeriesColor(nearest.series);
   ctx.save();
   ctx.strokeStyle = tHov.hoverLine;
   ctx.lineWidth = 1;
@@ -1825,9 +1847,9 @@ function drawHover(layout, drawnPoints) {
 
   ctx.beginPath();
   ctx.arc(nearest.x, nearest.y, 7, 0, Math.PI * 2);
-  ctx.fillStyle = withAlpha(nearest.series.color, 0.12);
+  ctx.fillStyle = withAlpha(seriesColor, 0.12);
   ctx.fill();
-  ctx.strokeStyle = nearest.series.color;
+  ctx.strokeStyle = seriesColor;
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -1871,7 +1893,7 @@ function drawHover(layout, drawnPoints) {
   const valueX = tableX + tableW - 12;
 
   shadowedPanel(boxX, boxY, boxW, boxH, 14);
-  drawTintedImage(point.labInfo.logo, boxX + padX, boxY + padY + 2, 22, 22, point.labInfo.brandColor);
+  drawTintedImage(point.labInfo.logo, boxX + padX, boxY + padY + 2, 22, 22, getLabColor(point.labInfo));
 
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
@@ -1896,7 +1918,7 @@ function drawHover(layout, drawnPoints) {
 
     if (row.active) {
       roundedRect(tableX + 1, rowY + 1, tableW - 2, tableRowH - 2, 10);
-      ctx.fillStyle = withAlpha(point.seriesInfo.color, 0.1);
+      ctx.fillStyle = withAlpha(seriesColor, 0.1);
       ctx.fill();
     }
 
@@ -1914,7 +1936,7 @@ function drawHover(layout, drawnPoints) {
     ctx.fillText(row.label, labelX, centerY + 0.5);
 
     ctx.textAlign = "right";
-    ctx.fillStyle = row.active ? point.seriesInfo.color : tHov.hoverValueInk;
+    ctx.fillStyle = row.active ? seriesColor : tHov.hoverValueInk;
     ctx.font = valueFont;
     ctx.fillText(row.value, valueX, centerY + 0.5);
   }
@@ -2368,6 +2390,15 @@ function withAlpha(hex, alpha) {
   const g = parseInt(normalized.slice(2, 4), 16);
   const b = parseInt(normalized.slice(4, 6), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function getCheckMarkColor(hex) {
+  const normalized = hex.replace("#", "");
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+  const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  return luminance > 0.62 ? "#0b1220" : "#ffffff";
 }
 
 function clamp(value, min, max) {
