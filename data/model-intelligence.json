@@ -1,7 +1,7 @@
 {
   "meta": {
     "benchmark": "Artificial Analysis Intelligence Index",
-    "asOf": "2026-06-09",
+    "asOf": "2026-07-24",
     "valueFormula": "(inputUsdPer1M + outputUsdPer1M) / intelligenceScore",
     "unit": "USD per 1M tokens per Artificial Analysis intelligence point",
     "notes": [
@@ -353,6 +353,35 @@
       "sourceReleased": "June 9, 2026",
       "resolution": "exact",
       "note": "Artificial Analysis reports the score with Anthropic's Opus 4.8 fallback mechanism enabled."
+    },
+    "gpt-5.6-sol": {
+      "score": 59,
+      "sourceModel": "GPT-5.6 Sol (max)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-6-sol",
+      "sourceReleased": "July 9, 2026",
+      "resolution": "exact"
+    },
+    "gpt-5.6-terra": {
+      "score": 55,
+      "sourceModel": "GPT-5.6 Terra (max)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-6-terra",
+      "sourceReleased": "July 9, 2026",
+      "resolution": "exact"
+    },
+    "gpt-5.6-luna": {
+      "score": 51,
+      "sourceModel": "GPT-5.6 Luna (max)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-6-luna",
+      "sourceReleased": "July 9, 2026",
+      "resolution": "exact"
+    },
+    "Claude Opus 5": {
+      "score": 61,
+      "sourceModel": "Claude Opus 5 (Adaptive Reasoning, Max Effort)",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-opus-5",
+      "sourceReleased": "July 24, 2026",
+      "resolution": "exact",
+      "note": "Artificial Analysis reports the max-effort score with Anthropic's Opus 4.8 fallback mechanism enabled."
     }
   }
 }

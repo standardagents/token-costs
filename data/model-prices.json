@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Major AI lab API token prices over time",
-    "asOf": "2026-06-09",
+    "asOf": "2026-07-24",
     "currency": "USD",
     "unit": "per 1M tokens",
     "defaultMetric": "outputUsdPer1M",
@@ -135,6 +135,7 @@
     "openai-gpt54": "https://openai.com/index/introducing-gpt-5-4/",
     "openai-gpt54-mini": "https://openai.com/index/introducing-gpt-5-4-mini-and-nano/",
     "openai-gpt55": "https://openai.com/index/introducing-gpt-5-5/",
+    "openai-gpt56": "https://openai.com/index/gpt-5-6/",
     "openai-pricing": "https://openai.com/api/pricing/",
     "anthropic-claude2": "https://www.anthropic.com/news/claude-2",
     "anthropic-pricing-pdf": "https://www-cdn.anthropic.com/files/4zrzovbb/website/90df03aed08b794ab03c5a7bf28b2ad9cf26cf3c.pdf",
@@ -151,6 +152,7 @@
     "anthropic-sonnet46": "https://www.anthropic.com/claude/sonnet",
     "anthropic-opus47": "https://www.anthropic.com/news/claude-opus-4-7",
     "anthropic-opus48": "https://www.anthropic.com/news/claude-opus-4-8",
+    "anthropic-opus5": "https://www.anthropic.com/news/claude-opus-5",
     "anthropic-fable5": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
     "google-io-2024": "https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/",
     "google-developer-may-2024": "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-gemma-developer-updates-may-2024/",
@@ -732,6 +734,54 @@
         "anthropic-fable5"
       ],
       "note": "First public Mythos-class Claude model; Anthropic lists API availability as claude-fable-5."
+    },
+    {
+      "date": "2026-07-09",
+      "lab": "openai",
+      "series": "openai-gpt-frontier",
+      "model": "gpt-5.6-sol",
+      "inputUsdPer1M": 5,
+      "outputUsdPer1M": 30,
+      "sourceIds": [
+        "openai-gpt56",
+        "openai-pricing"
+      ]
+    },
+    {
+      "date": "2026-07-09",
+      "lab": "openai",
+      "series": "openai-gpt-mini",
+      "model": "gpt-5.6-terra",
+      "inputUsdPer1M": 2.5,
+      "outputUsdPer1M": 15,
+      "sourceIds": [
+        "openai-gpt56",
+        "openai-pricing"
+      ]
+    },
+    {
+      "date": "2026-07-09",
+      "lab": "openai",
+      "series": "openai-gpt-nano",
+      "model": "gpt-5.6-luna",
+      "inputUsdPer1M": 1,
+      "outputUsdPer1M": 6,
+      "sourceIds": [
+        "openai-gpt56",
+        "openai-pricing"
+      ]
+    },
+    {
+      "date": "2026-07-24",
+      "lab": "anthropic",
+      "series": "anthropic-opus",
+      "model": "Claude Opus 5",
+      "inputUsdPer1M": 5,
+      "outputUsdPer1M": 25,
+      "sourceIds": [
+        "anthropic-opus5"
+      ],
+      "note": "Uses regular Claude API pricing. Anthropic also offers Fast mode at $10/$50 per 1M tokens, which is outside the standard-rate basis."
     }
   ]
 }
