@@ -1,7 +1,7 @@
 {
   "meta": {
     "benchmark": "Artificial Analysis Intelligence Index",
-    "asOf": "2026-07-24",
+    "asOf": "2026-07-30",
     "valueFormula": "(inputUsdPer1M + outputUsdPer1M) / intelligenceScore",
     "unit": "USD per 1M tokens per Artificial Analysis intelligence point",
     "notes": [
@@ -382,6 +382,22 @@
       "sourceReleased": "July 24, 2026",
       "resolution": "exact",
       "note": "Artificial Analysis reports the max-effort score with Anthropic's Opus 4.8 fallback mechanism enabled."
+    },
+    "gpt-5.6-terra price reduction": {
+      "score": 55,
+      "sourceModel": "GPT-5.6 Terra (max)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-6-terra",
+      "sourceReleased": "July 9, 2026",
+      "resolution": "price_update",
+      "note": "Price-only update; reuses the GPT-5.6 Terra benchmark."
+    },
+    "gpt-5.6-luna price reduction": {
+      "score": 51,
+      "sourceModel": "GPT-5.6 Luna (max)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-6-luna",
+      "sourceReleased": "July 9, 2026",
+      "resolution": "price_update",
+      "note": "Price-only update; reuses the GPT-5.6 Luna benchmark."
     }
   }
 }

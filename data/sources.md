@@ -28,6 +28,7 @@ Artificial Analysis intelligence mappings are stored in `data/model-intelligence
 - `Gemini 3.5 Flash` is represented for the May 19, 2026 launch. Google announced `Gemini 3.5 Pro` for the following month, but no public API price was available as of the June 8, 2026 update.
 - `Claude Opus 4.8` is represented at Anthropic's regular API price. Anthropic also lists fast mode pricing, but this dataset excludes non-standard processing modes.
 - `Claude Opus 5` is represented at Anthropic's regular API price. Anthropic also lists Fast mode pricing, but this dataset excludes non-standard processing modes.
+- `GPT-5.6 Terra` and `GPT-5.6 Luna` retain their July 9 launch-price points, followed by separate July 30 price-reduction events at $2/$12 and $0.20/$1.20 per 1M input/output tokens.
 - `Claude Mythos Preview` is not represented because Anthropic described it as limited to a small number of organizations, without generally available public API pricing as of the June 8, 2026 update.
 
 ## Primary Provider Links
@@ -36,6 +37,7 @@ Artificial Analysis intelligence mappings are stored in `data/model-intelligence
 - OpenAI GPT-5 for developers: https://openai.com/index/introducing-gpt-5-for-developers
 - OpenAI GPT-5.5: https://openai.com/index/introducing-gpt-5-5/
 - OpenAI GPT-5.6: https://openai.com/index/gpt-5-6/
+- OpenAI GPT-5.6 Terra and Luna price reductions: https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/
 - Artificial Analysis model leaderboard: https://artificialanalysis.ai/leaderboards/models
 - Anthropic Claude model/pricing docs and launch posts: https://docs.anthropic.com/en/docs/about-claude/models/overview
 - Anthropic Claude 3 family: https://www.anthropic.com/news/claude-3-family

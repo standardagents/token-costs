@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Major AI lab API token prices over time",
-    "asOf": "2026-07-24",
+    "asOf": "2026-07-30",
     "currency": "USD",
     "unit": "per 1M tokens",
     "defaultMetric": "outputUsdPer1M",
@@ -136,6 +136,7 @@
     "openai-gpt54-mini": "https://openai.com/index/introducing-gpt-5-4-mini-and-nano/",
     "openai-gpt55": "https://openai.com/index/introducing-gpt-5-5/",
     "openai-gpt56": "https://openai.com/index/gpt-5-6/",
+    "openai-gpt56-price-cuts": "https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/",
     "openai-pricing": "https://openai.com/api/pricing/",
     "anthropic-claude2": "https://www.anthropic.com/news/claude-2",
     "anthropic-pricing-pdf": "https://www-cdn.anthropic.com/files/4zrzovbb/website/90df03aed08b794ab03c5a7bf28b2ad9cf26cf3c.pdf",
@@ -782,6 +783,32 @@
         "anthropic-opus5"
       ],
       "note": "Uses regular Claude API pricing. Anthropic also offers Fast mode at $10/$50 per 1M tokens, which is outside the standard-rate basis."
+    },
+    {
+      "date": "2026-07-30",
+      "lab": "openai",
+      "series": "openai-gpt-mini",
+      "model": "gpt-5.6-terra price reduction",
+      "inputUsdPer1M": 2,
+      "outputUsdPer1M": 12,
+      "sourceIds": [
+        "openai-gpt56-price-cuts",
+        "openai-pricing"
+      ],
+      "note": "Official 20% API price reduction; the July 9 launch price remains represented as a separate point."
+    },
+    {
+      "date": "2026-07-30",
+      "lab": "openai",
+      "series": "openai-gpt-nano",
+      "model": "gpt-5.6-luna price reduction",
+      "inputUsdPer1M": 0.2,
+      "outputUsdPer1M": 1.2,
+      "sourceIds": [
+        "openai-gpt56-price-cuts",
+        "openai-pricing"
+      ],
+      "note": "Official 80% API price reduction; the July 9 launch price remains represented as a separate point."
     }
   ]
 }
