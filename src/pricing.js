@@ -15,6 +15,13 @@ export const cohortOptions = [
 ];
 
 export const DEFAULT_METRIC = "outputUsdPer1M";
+export const DEFAULT_TIMELINE_ZOOM = "all";
+export const timelineZoomOptions = [
+  { id: "all", param: "all", label: "All", months: null },
+  { id: "2y", param: "2y", label: "2Y", months: 24 },
+  { id: "1y", param: "1y", label: "1Y", months: 12 },
+  { id: "6m", param: "6m", label: "6M", months: 6 }
+];
 
 export function normalizeData(data, intelligenceData = null) {
   const labs = new Map(data.labs.map((lab) => [lab.id, lab]));
@@ -61,6 +68,7 @@ export function normalizeData(data, intelligenceData = null) {
 
 export function createViewStateFromSearchParams(data, searchParams) {
   const metric = parseMetricParam(searchParams.get("metric")) || data.meta?.defaultMetric || DEFAULT_METRIC;
+  const timelineZoom = parseTimelineZoomParam(searchParams.get("zoom")) || DEFAULT_TIMELINE_ZOOM;
   const enabledLabs = parseEnabledList(
     searchParams.get("labs"),
     Array.from(data.labs.keys())
@@ -69,7 +77,7 @@ export function createViewStateFromSearchParams(data, searchParams) {
     searchParams.get("models"),
     cohortOptions.map((cohort) => cohort.id)
   );
-  const baseView = { metric, enabledLabs, enabledCohorts };
+  const baseView = { metric, timelineZoom, enabledLabs, enabledCohorts };
   const extent = getVisibleDateExtent(data, baseView);
   const fallbackStart = snapToUtcDay(extent.min + (extent.max - extent.min) * 0.5);
   const fallbackEnd = extent.max;
@@ -93,6 +101,7 @@ export function serializeViewState(data, view) {
     .filter((id) => view.enabledCohorts.has(id));
 
   params.set("metric", metric.param);
+  params.set("zoom", getTimelineZoomOption(view.timelineZoom).param);
   params.set("labs", enabledLabs.join(","));
   params.set("models", enabledCohorts.join(","));
   params.set("from", dateValueToParam(view.startDateValue));
@@ -107,6 +116,17 @@ export function getVisiblePoints(data, view) {
 }
 
 export function getVisibleDateExtent(data, view) {
+  const fullExtent = getFullVisibleDateExtent(data, view);
+  const zoom = getTimelineZoomOption(view.timelineZoom);
+  if (!zoom.months) return fullExtent;
+
+  return {
+    min: Math.max(fullExtent.min, shiftUtcMonths(fullExtent.max, -zoom.months)),
+    max: fullExtent.max
+  };
+}
+
+export function getFullVisibleDateExtent(data, view) {
   const points = getVisiblePoints(data, view);
   if (!points.length) {
     return {
@@ -121,10 +141,49 @@ export function getVisibleDateExtent(data, view) {
   };
 }
 
+export function getVisibleTimelinePoints(data, view) {
+  const extent = getVisibleDateExtent(data, view);
+  const visible = [];
+
+  for (const [, points] of getVisibleSeriesEntries(data, view)) {
+    let boundaryPoint = null;
+    for (const point of points) {
+      if (point.dateValue <= extent.min) boundaryPoint = point;
+      if (point.dateValue > extent.min && point.dateValue <= extent.max) visible.push(point);
+      if (point.dateValue > extent.max) break;
+    }
+    if (boundaryPoint) visible.push(boundaryPoint);
+  }
+
+  return visible;
+}
+
 export function getVisibleSeriesEntries(data, view) {
   return Array.from(data.pointsBySeries.entries()).filter(([, points]) =>
     points.some((point) => isLabEnabled(view, point.lab) && isCohortEnabled(view, getSeriesCohort(data, point.series)))
   );
+}
+
+export function getTimelineSeriesPoints(points, dateMin, dateMax) {
+  let boundaryPoint = null;
+  const visible = [];
+
+  for (const point of points) {
+    if (point.dateValue <= dateMin) boundaryPoint = point;
+    if (point.dateValue > dateMin && point.dateValue <= dateMax) visible.push(point);
+    if (point.dateValue > dateMax) break;
+  }
+
+  if (boundaryPoint) {
+    visible.unshift({
+      ...boundaryPoint,
+      date: dateValueToParam(dateMin),
+      dateValue: dateMin,
+      boundary: boundaryPoint.dateValue !== dateMin
+    });
+  }
+
+  return visible;
 }
 
 export function getExtendedSeriesPoints(points, dateMax) {
@@ -265,6 +324,38 @@ export function isIntelligenceMetric(metric) {
   return metric === INTELLIGENCE_METRIC;
 }
 
+export function getTimelineTicks(min, max) {
+  const rangeDays = Math.max(1, (max - min) / DAY_MS);
+  const intervalMonths = rangeDays <= 220
+    ? 1
+    : rangeDays <= 460
+      ? 2
+      : rangeDays <= 900
+        ? 3
+        : rangeDays <= 1500
+          ? 6
+          : 12;
+  const first = new Date(min);
+  first.setUTCHours(0, 0, 0, 0);
+  first.setUTCDate(1);
+  while (first.getTime() < min || first.getUTCMonth() % intervalMonths !== 0) {
+    first.setUTCMonth(first.getUTCMonth() + 1);
+  }
+
+  const ticks = [];
+  let previousYear = null;
+  for (const date = new Date(first); date.getTime() <= max; date.setUTCMonth(date.getUTCMonth() + intervalMonths)) {
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth();
+    const label = intervalMonths === 12
+      ? String(year)
+      : `${date.toLocaleString("en-US", { month: "short", timeZone: "UTC" })}${previousYear == null || previousYear !== year ? ` ’${String(year).slice(-2)}` : ""}`;
+    ticks.push({ value: date.getTime(), label });
+    previousYear = year;
+  }
+  return ticks;
+}
+
 export function getLogTicks(min, max) {
   if (!Number.isFinite(min) || !Number.isFinite(max) || min <= 0 || max <= 0) return [];
 
@@ -336,6 +427,26 @@ function parseMetricParam(value) {
   const normalized = String(value).trim();
   const option = metricOptions.find((item) => item.param === normalized || item.id === normalized);
   return option?.id || null;
+}
+
+function parseTimelineZoomParam(value) {
+  if (!value) return null;
+  const normalized = String(value).trim().toLowerCase();
+  return timelineZoomOptions.find((item) => item.param === normalized || item.id === normalized)?.id || null;
+}
+
+function getTimelineZoomOption(value) {
+  return timelineZoomOptions.find((item) => item.id === value || item.param === value) || timelineZoomOptions[0];
+}
+
+function shiftUtcMonths(value, amount) {
+  const source = new Date(value);
+  const day = source.getUTCDate();
+  const shifted = new Date(Date.UTC(source.getUTCFullYear(), source.getUTCMonth(), 1));
+  shifted.setUTCMonth(shifted.getUTCMonth() + amount);
+  const lastDay = new Date(Date.UTC(shifted.getUTCFullYear(), shifted.getUTCMonth() + 1, 0)).getUTCDate();
+  shifted.setUTCDate(Math.min(day, lastDay));
+  return shifted.getTime();
 }
 
 function parseDateParam(value) {

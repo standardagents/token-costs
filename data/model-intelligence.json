@@ -1,7 +1,7 @@
 {
   "meta": {
     "benchmark": "Artificial Analysis Intelligence Index",
-    "asOf": "2026-07-30",
+    "asOf": "2026-08-16",
     "valueFormula": "(inputUsdPer1M + outputUsdPer1M) / intelligenceScore",
     "unit": "USD per 1M tokens per Artificial Analysis intelligence point",
     "notes": [
@@ -354,6 +354,13 @@
       "resolution": "exact",
       "note": "Artificial Analysis reports the score with Anthropic's Opus 4.8 fallback mechanism enabled."
     },
+    "Claude Sonnet 5": {
+      "score": 53,
+      "sourceModel": "Claude Sonnet 5 (Adaptive Reasoning, Max Effort)",
+      "sourceUrl": "https://artificialanalysis.ai/models/claude-sonnet-5",
+      "sourceReleased": "June 30, 2026",
+      "resolution": "exact"
+    },
     "gpt-5.6-sol": {
       "score": 59,
       "sourceModel": "GPT-5.6 Sol (max)",
@@ -373,6 +380,20 @@
       "sourceModel": "GPT-5.6 Luna (max)",
       "sourceUrl": "https://artificialanalysis.ai/models/gpt-5-6-luna",
       "sourceReleased": "July 9, 2026",
+      "resolution": "exact"
+    },
+    "Gemini 3.6 Flash": {
+      "score": 52,
+      "sourceModel": "Gemini 3.6 Flash (high)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-3-6-flash",
+      "sourceReleased": "July 21, 2026",
+      "resolution": "exact"
+    },
+    "Gemini 3.5 Flash-Lite": {
+      "score": 36,
+      "sourceModel": "Gemini 3.5 Flash-Lite",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-3-5-flash-lite",
+      "sourceReleased": "July 21, 2026",
       "resolution": "exact"
     },
     "Claude Opus 5": {
@@ -398,6 +419,13 @@
       "sourceReleased": "July 9, 2026",
       "resolution": "price_update",
       "note": "Price-only update; reuses the GPT-5.6 Luna benchmark."
+    },
+    "Gemini 3.7 Flash": {
+      "score": 56,
+      "sourceModel": "Gemini 3.7 Flash (high)",
+      "sourceUrl": "https://artificialanalysis.ai/models/gemini-3-7-flash",
+      "sourceReleased": "August 13, 2026",
+      "resolution": "exact"
     }
   }
 }

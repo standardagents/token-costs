@@ -2,7 +2,7 @@
 
 A dependency-free full-screen Canvas chart of OpenAI, Anthropic, and Google API token prices over time.
 
-The chart now includes a `Per IQ` mode that normalizes each release by the Artificial Analysis Intelligence Index using combined input + output token price.
+The chart includes a `Per IQ` mode that normalizes each release by the Artificial Analysis Intelligence Index using combined input + output token price. Its timeline can be zoomed to the full history or the latest two years, year, or six months without changing the draggable comparison range.
 
 ## Run
 

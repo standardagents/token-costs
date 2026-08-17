@@ -22,6 +22,7 @@ const state = {
   width: 0,
   height: 0,
   metric: "outputUsdPer1M",
+  timelineZoom: pricing.DEFAULT_TIMELINE_ZOOM,
   theme: initialTheme,
   themePreference: (() => {
     try { return window.localStorage?.getItem(THEME_STORAGE_KEY) || "system"; }
@@ -30,6 +31,7 @@ const state = {
   hover: null,
   pointer: { x: -1, y: -1 },
   controls: [],
+  timelineZoomControls: [],
   labToggles: [],
   cohortToggles: [],
   shareButton: null,
@@ -204,6 +206,7 @@ function getSaBarHeight() {
 
 const metricOptions = pricing.metricOptions;
 const cohortOptions = pricing.cohortOptions;
+const timelineZoomOptions = pricing.timelineZoomOptions;
 
 const money = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -241,6 +244,7 @@ function normalizeData(data, intelligenceData) {
 
 function applyViewState(view) {
   state.metric = view.metric;
+  state.timelineZoom = view.timelineZoom;
   state.enabledLabs = new Set(view.enabledLabs);
   state.enabledCohorts = new Set(view.enabledCohorts);
   state.startDateValue = view.startDateValue;
@@ -251,6 +255,7 @@ function applyViewState(view) {
 function getViewState() {
   return {
     metric: state.metric,
+    timelineZoom: state.timelineZoom,
     enabledLabs: state.enabledLabs,
     enabledCohorts: state.enabledCohorts,
     startDateValue: state.startDateValue,
@@ -404,6 +409,7 @@ function onPointerDown(event) {
   };
 
   const onControl = getControlAt(pointer.x, pointer.y);
+  const onTimelineZoom = getTimelineZoomControlAt(pointer.x, pointer.y);
   const onLabToggle = getLabToggleAt(pointer.x, pointer.y);
   const onCohortToggle = getCohortToggleAt(pointer.x, pointer.y);
   const onShareButton = getShareButtonAt(pointer.x, pointer.y);
@@ -414,6 +420,7 @@ function onPointerDown(event) {
   const onBubblePanel = getBubblePanelAt(pointer.x, pointer.y);
   if (
     onControl ||
+    onTimelineZoom ||
     onLabToggle ||
     onCohortToggle ||
     onShareButton ||
@@ -497,6 +504,13 @@ function onClick(event) {
     state.metric = control.id;
     updateUrlFromState();
     draw();
+    return;
+  }
+
+  const timelineZoom = getTimelineZoomControlAt(x, y);
+
+  if (timelineZoom) {
+    setTimelineZoom(timelineZoom.id);
     return;
   }
 
@@ -739,7 +753,7 @@ function drawBackdrop(width, height, now) {
 function getLayout(width, height) {
   const compact = width < 1180 || height < 560;
   const margin = compact
-    ? { top: 180, right: 18, bottom: 44, left: 50 }
+    ? { top: width < 720 ? 224 : 180, right: 18, bottom: 44, left: 50 }
     : { top: 152, right: 204, bottom: 84, left: 92 };
 
   return {
@@ -757,7 +771,7 @@ function getLayout(width, height) {
 }
 
 function getScales(layout) {
-  const points = getVisiblePoints();
+  const points = pricing.getVisibleTimelinePoints(state.data, getViewState());
   const values = points
     .map((point) => metricValue(point))
     .filter((value) => Number.isFinite(value));
@@ -916,6 +930,7 @@ function drawControls(layout) {
   const { compact, width } = layout;
   const controlY = compact ? 96 : 100;
   state.controls = [];
+  state.timelineZoomControls = [];
   state.labToggles = [];
   state.cohortToggles = [];
   state.shareButton = null;
@@ -925,6 +940,7 @@ function drawControls(layout) {
 
   ctx.save();
   drawMetricControls(metricLayout);
+  drawTimelineZoomControls(layout);
 
   if (compact) {
     const filterW = measureFilterButtonWidth(compact);
@@ -951,6 +967,64 @@ function drawControls(layout) {
     drawCohortToggles(cohortX, controlY + 17, compact);
   }
 
+  ctx.restore();
+}
+
+function drawTimelineZoomControls(layout) {
+  const { chart, compact } = layout;
+  const h = 28;
+  const itemW = compact ? 38 : 40;
+  const w = itemW * timelineZoomOptions.length;
+  const x = compact ? chart.x + chart.w - w : chart.x;
+  const y = compact ? chart.y - h - 10 : chart.y + chart.h + 42;
+  const activeIndex = timelineZoomOptions.findIndex((option) => option.id === state.timelineZoom);
+  const t = T();
+
+  ctx.save();
+  if (!compact) {
+    ctx.fillStyle = t.sectionLabel;
+    ctx.font = "600 9px Inter, system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "bottom";
+    ctx.fillText("TIMELINE", x + 2, y - 7);
+  }
+
+  ctx.shadowColor = t.controlShadow;
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetY = 2;
+  roundedRect(x, y, w, h, h / 2);
+  ctx.fillStyle = t.controlBg;
+  ctx.fill();
+  ctx.restore();
+
+  roundedRect(x, y, w, h, h / 2);
+  ctx.strokeStyle = t.controlBorder;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.save();
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = `600 ${compact ? 10.5 : 11}px Inter, system-ui, sans-serif`;
+  timelineZoomOptions.forEach((option, index) => {
+    const item = { id: option.id, x: x + itemW * index, y, w: itemW, h };
+    const active = index === activeIndex;
+    const adjacentToActive = index === activeIndex + 1 || index === activeIndex - 1;
+    if (active) {
+      roundedRect(item.x + 2, y + 2, item.w - 4, h - 4, h / 2 - 2);
+      ctx.fillStyle = t.controlActiveBg;
+      ctx.fill();
+    } else if (index > 0 && !adjacentToActive) {
+      ctx.strokeStyle = t.controlDivider;
+      ctx.beginPath();
+      ctx.moveTo(item.x, y + 7);
+      ctx.lineTo(item.x, y + h - 7);
+      ctx.stroke();
+    }
+    ctx.fillStyle = active ? t.controlActiveInk : t.controlInk;
+    ctx.fillText(option.label, item.x + item.w / 2, y + h / 2 + 0.5);
+    state.timelineZoomControls.push(item);
+  });
   ctx.restore();
 }
 
@@ -1206,7 +1280,7 @@ function drawAxes(layout, scales) {
   const { chart, compact } = layout;
   const t = T();
   const yTicks = pricing.getLogTicks(scales.yMin, scales.yMax);
-  const years = [2023, 2024, 2025, 2026];
+  const timelineTicks = pricing.getTimelineTicks(scales.dateMin, scales.dateMax);
 
   ctx.save();
   ctx.lineWidth = 1;
@@ -1227,8 +1301,8 @@ function drawAxes(layout, scales) {
 
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  years.forEach((year) => {
-    const x = scales.x(new Date(`${year}-01-01T00:00:00Z`).getTime());
+  timelineTicks.forEach((tick) => {
+    const x = scales.x(tick.value);
     if (x < chart.x || x > chart.x + chart.w) return;
     ctx.strokeStyle = t.chartGrid;
     ctx.beginPath();
@@ -1236,7 +1310,7 @@ function drawAxes(layout, scales) {
     ctx.lineTo(x, chart.y + chart.h);
     ctx.stroke();
     ctx.fillStyle = t.yearInk;
-    ctx.fillText(String(year), x, chart.y + chart.h + 14);
+    ctx.fillText(tick.label, x, chart.y + chart.h + 14);
   });
 
   if (!compact) {
@@ -1264,11 +1338,15 @@ function drawLines(layout, scales, drawnPoints, now) {
   ctx.save();
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
+  ctx.beginPath();
+  ctx.rect(layout.chart.x - 5, layout.chart.y - 5, layout.chart.w + 10, layout.chart.h + 10);
+  ctx.clip();
 
   for (const [seriesId, points] of seriesEntries) {
     const series = state.data.series.get(seriesId);
     const seriesColor = getSeriesColor(series);
-    const visiblePathPoints = pricing.getExtendedSeriesPoints(points, scales.dateMax);
+    const timelinePoints = pricing.getTimelineSeriesPoints(points, scales.dateMin, scales.dateMax);
+    const visiblePathPoints = pricing.getExtendedSeriesPoints(timelinePoints, scales.dateMax);
     const path = visiblePathPoints.map((point) => ({
       point,
       x: scales.x(point.dateValue),
@@ -1286,7 +1364,7 @@ function drawLines(layout, scales, drawnPoints, now) {
     drawSeriesPath(path, series.dash, withAlpha(seriesColor, 0.86 * alphaProgress), layout.compact ? 2 : 2.6);
     ctx.restore();
 
-    for (const item of path.filter((item) => !item.point.extended)) {
+    for (const item of path.filter((item) => !item.point.extended && !item.point.boundary && item.x >= layout.chart.x - 1 && item.x <= layout.chart.x + layout.chart.w + 1)) {
       drawnPoints.push({ ...item, series });
       const inRange = item.x >= startX - 0.5 && item.x <= endX + 0.5;
       const color = inRange ? seriesColor : t.extendedSeries;
@@ -2031,6 +2109,7 @@ function intersectsUiChrome(x, y, w, h) {
 function getUiAvoidRects() {
   return [
     ...state.controls,
+    ...state.timelineZoomControls,
     ...state.labToggles,
     ...state.cohortToggles,
     state.shareButton,
@@ -2072,6 +2151,7 @@ function getPointerCursor(pointer) {
     getFilterButtonAt(pointer.x, pointer.y) ||
     getThemeButtonAt(pointer.x, pointer.y) ||
     getControlAt(pointer.x, pointer.y) ||
+    getTimelineZoomControlAt(pointer.x, pointer.y) ||
     getBubbleMinimizeAt(pointer.x, pointer.y) ||
     (state.bubbleMinimized && getBubblePanelAt(pointer.x, pointer.y))
   ) {
@@ -2084,6 +2164,33 @@ function getControlAt(x, y) {
   return state.controls.find(
     (item) => x >= item.x && x <= item.x + item.w && y >= item.y && y <= item.y + item.h
   );
+}
+
+function getTimelineZoomControlAt(x, y) {
+  if (state.filterPanelOpen && getFilterPanelAt(x, y)) return null;
+  return state.timelineZoomControls.find(
+    (item) => x >= item.x && x <= item.x + item.w && y >= item.y && y <= item.y + item.h
+  );
+}
+
+function setTimelineZoom(id) {
+  if (id === state.timelineZoom) return;
+  const previousStart = state.startDateValue;
+  const previousEnd = state.endDateValue;
+  state.timelineZoom = id;
+  const extent = getVisibleDateExtent();
+  const overlaps = previousEnd >= extent.min && previousStart <= extent.max;
+
+  if (overlaps) {
+    clampCompareDateToVisibleRange();
+  } else {
+    state.startDateValue = pricing.snapToUtcDay(extent.min + (extent.max - extent.min) * 0.5);
+    state.endDateValue = extent.max;
+  }
+
+  state.hover = null;
+  updateUrlFromState();
+  draw();
 }
 
 function getLabToggleAt(x, y) {

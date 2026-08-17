@@ -2,8 +2,10 @@ import {
   getComparisonStats,
   getExtendedSeriesPoints,
   getLogTicks,
+  getTimelineSeriesPoints,
+  getTimelineTicks,
   getVisibleDateExtent,
-  getVisiblePoints,
+  getVisibleTimelinePoints,
   getVisibleSeriesEntries,
   metricValue
 } from "./pricing.js";
@@ -60,7 +62,7 @@ export function renderOgSvg(data, view) {
 }
 
 function getOgScales(data, view, chart) {
-  const points = getVisiblePoints(data, view);
+  const points = getVisibleTimelinePoints(data, view);
   const values = points
     .map((point) => metricValue(point, view.metric))
     .filter((value) => Number.isFinite(value));
@@ -89,7 +91,8 @@ function getOgScales(data, view, chart) {
 function renderSeries(data, view, chart, scales) {
   return getVisibleSeriesEntries(data, view).map(([seriesId, points]) => {
     const series = data.series.get(seriesId);
-    const pathPoints = getExtendedSeriesPoints(points, scales.dateMax);
+    const timelinePoints = getTimelineSeriesPoints(points, scales.dateMin, scales.dateMax);
+    const pathPoints = getExtendedSeriesPoints(timelinePoints, scales.dateMax);
     const d = buildPath(pathPoints, scales, view.metric);
 
     return `
@@ -100,13 +103,13 @@ function renderSeries(data, view, chart, scales) {
 
 function renderGrid(chart, scales) {
   const yTicks = getLogTicks(scales.yMin, scales.yMax);
-  const yearTicks = [2023, 2024, 2025, 2026];
+  const timelineTicks = getTimelineTicks(scales.dateMin, scales.dateMax);
   const yMarkup = yTicks.map((tick) => {
     const y = scales.y(tick);
     return `<line x1="${chart.x}" y1="${round(y)}" x2="${chart.x + chart.w}" y2="${round(y)}" stroke="#111827" stroke-opacity="${tick === 1 ? 0.12 : 0.055}"/>`;
   }).join("");
-  const xMarkup = yearTicks.map((year) => {
-    const x = scales.x(Date.parse(`${year}-01-01T00:00:00Z`));
+  const xMarkup = timelineTicks.map((tick) => {
+    const x = scales.x(tick.value);
     if (x < chart.x || x > chart.x + chart.w) return "";
     return `<line x1="${round(x)}" y1="${chart.y}" x2="${round(x)}" y2="${chart.y + chart.h}" stroke="#111827" stroke-opacity="0.055"/>`;
   }).join("");
