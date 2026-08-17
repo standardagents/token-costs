@@ -9,9 +9,10 @@ export const metricOptions = [
 ];
 
 export const cohortOptions = [
-  { id: "frontier", label: "Frontier", color: "#111827" },
-  { id: "mini", label: "Small", color: "#64748b" },
-  { id: "nano", label: "Tiny", color: "#8ab4f8" }
+  { id: "xlarge", label: "X-Large", color: "#8f3b21" },
+  { id: "large", label: "Large", color: "#111827" },
+  { id: "small", label: "Small", color: "#64748b" },
+  { id: "tiny", label: "Tiny", color: "#8ab4f8" }
 ];
 
 export const DEFAULT_METRIC = "outputUsdPer1M";
@@ -73,10 +74,7 @@ export function createViewStateFromSearchParams(data, searchParams) {
     searchParams.get("labs"),
     Array.from(data.labs.keys())
   );
-  const enabledCohorts = parseEnabledList(
-    searchParams.get("models"),
-    cohortOptions.map((cohort) => cohort.id)
-  );
+  const enabledCohorts = parseEnabledCohorts(searchParams.get("models"));
   const baseView = { metric, timelineZoom, enabledLabs, enabledCohorts };
   const extent = getVisibleDateExtent(data, baseView);
   const fallbackStart = snapToUtcDay(extent.min + (extent.max - extent.min) * 0.5);
@@ -227,11 +225,9 @@ export function getComparisonStats(data, view) {
   const startDate = view.startDateValue;
   const endDate = view.endDateValue;
   const rows = [];
-  const groups = {
-    frontier: { label: "Frontier avg", rows: [] },
-    mini: { label: "Small avg", rows: [] },
-    nano: { label: "Tiny avg", rows: [] }
-  };
+  const groups = Object.fromEntries(
+    cohortOptions.map((cohort) => [cohort.id, { label: `${cohort.label} avg`, rows: [] }])
+  );
 
   for (const [seriesId, points] of getVisibleSeriesEntries(data, view)) {
     const start = getLatestAtOrBefore(points, startDate);
@@ -289,7 +285,7 @@ export function getComparisonStats(data, view) {
 }
 
 export function getSeriesCohort(data, seriesId) {
-  return data.series.get(seriesId)?.cohort || "frontier";
+  return data.series.get(seriesId)?.cohort || "large";
 }
 
 export function isLabEnabled(view, labId) {
@@ -322,6 +318,27 @@ export function metricAxisLabel(metric) {
 
 export function isIntelligenceMetric(metric) {
   return metric === INTELLIGENCE_METRIC;
+}
+
+export function getLogDomain(values, { paddingRatio = 0.08, minimumSpan = 0.6 } = {}) {
+  const positiveValues = values.filter((value) => Number.isFinite(value) && value > 0);
+  if (!positiveValues.length) return { min: 0.1, max: 1 };
+
+  let logMin = Math.log10(Math.min(...positiveValues));
+  let logMax = Math.log10(Math.max(...positiveValues));
+  const rawSpan = logMax - logMin;
+
+  if (rawSpan < minimumSpan) {
+    const midpoint = (logMin + logMax) / 2;
+    logMin = midpoint - minimumSpan / 2;
+    logMax = midpoint + minimumSpan / 2;
+  }
+
+  const padding = Math.max(0.04, (logMax - logMin) * paddingRatio);
+  return {
+    min: Number((10 ** (logMin - padding)).toPrecision(12)),
+    max: Number((10 ** (logMax + padding)).toPrecision(12))
+  };
 }
 
 export function getTimelineTicks(min, max) {
@@ -418,6 +435,22 @@ function parseEnabledList(value, allowed) {
   const requested = String(value || "")
     .split(",")
     .map((item) => item.trim())
+    .filter((item) => allowedSet.has(item));
+  return new Set(requested.length ? requested : allowed);
+}
+
+function parseEnabledCohorts(value) {
+  const aliases = {
+    frontier: "large",
+    mini: "small",
+    nano: "tiny"
+  };
+  const allowed = cohortOptions.map((cohort) => cohort.id);
+  const allowedSet = new Set(allowed);
+  const requested = String(value || "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .map((item) => aliases[item] || item)
     .filter((item) => allowedSet.has(item));
   return new Set(requested.length ? requested : allowed);
 }

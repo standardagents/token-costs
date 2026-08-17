@@ -1,6 +1,7 @@
 import {
   getComparisonStats,
   getExtendedSeriesPoints,
+  getLogDomain,
   getLogTicks,
   getTimelineSeriesPoints,
   getTimelineTicks,
@@ -67,12 +68,7 @@ function getOgScales(data, view, chart) {
     .map((point) => metricValue(point, view.metric))
     .filter((value) => Number.isFinite(value));
   const { min: dateMin, max: dateMax } = getVisibleDateExtent(data, view);
-  const minValue = values.length ? Math.min(...values) : 0.1;
-  const maxValue = values.length ? Math.max(...values) : 1;
-  const min = Math.max(0.005, minValue * 0.72);
-  const max = maxValue * 1.35;
-  const yMin = Math.pow(10, Math.floor(Math.log10(min)));
-  const yMax = Math.pow(10, Math.ceil(Math.log10(max)));
+  const { min: yMin, max: yMax } = getLogDomain(values);
   const dateRange = dateMax - dateMin || 1;
 
   return {

@@ -36,13 +36,13 @@
       "name": "GPT flagship",
       "color": "#111827",
       "dash": [],
-      "cohort": "frontier"
+      "cohort": "large"
     },
     {
       "id": "openai-gpt-mini",
       "lab": "openai",
       "name": "GPT mini",
-      "cohort": "mini",
+      "cohort": "small",
       "color": "#6b7280",
       "dash": [
         7,
@@ -53,7 +53,7 @@
       "id": "openai-gpt-nano",
       "lab": "openai",
       "name": "GPT nano",
-      "cohort": "nano",
+      "cohort": "tiny",
       "color": "#9ca3af",
       "dash": [
         2,
@@ -61,12 +61,20 @@
       ]
     },
     {
+      "id": "anthropic-fable",
+      "lab": "anthropic",
+      "name": "Claude Fable",
+      "color": "#8f3b21",
+      "dash": [],
+      "cohort": "xlarge"
+    },
+    {
       "id": "anthropic-opus",
       "lab": "anthropic",
-      "name": "Claude Opus/frontier",
+      "name": "Claude Opus",
       "color": "#b4532f",
       "dash": [],
-      "cohort": "frontier"
+      "cohort": "large"
     },
     {
       "id": "anthropic-sonnet",
@@ -77,7 +85,7 @@
         8,
         4
       ],
-      "cohort": "mini"
+      "cohort": "small"
     },
     {
       "id": "anthropic-haiku",
@@ -88,7 +96,7 @@
         2,
         5
       ],
-      "cohort": "nano"
+      "cohort": "tiny"
     },
     {
       "id": "google-pro",
@@ -96,7 +104,7 @@
       "name": "Gemini Pro",
       "color": "#1a73e8",
       "dash": [],
-      "cohort": "frontier"
+      "cohort": "large"
     },
     {
       "id": "google-flash",
@@ -107,7 +115,7 @@
         8,
         4
       ],
-      "cohort": "mini"
+      "cohort": "small"
     },
     {
       "id": "google-flash-lite",
@@ -118,7 +126,7 @@
         2,
         5
       ],
-      "cohort": "nano"
+      "cohort": "tiny"
     }
   ],
   "sources": {
@@ -730,7 +738,7 @@
     {
       "date": "2026-06-09",
       "lab": "anthropic",
-      "series": "anthropic-opus",
+      "series": "anthropic-fable",
       "model": "Claude Fable 5",
       "inputUsdPer1M": 10,
       "outputUsdPer1M": 50,

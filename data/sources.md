@@ -29,6 +29,7 @@ Artificial Analysis intelligence mappings are stored in `data/model-intelligence
 - `Claude Opus 4.8` is represented at Anthropic's regular API price. Anthropic also lists fast mode pricing, but this dataset excludes non-standard processing modes.
 - `Claude Opus 5` is represented at Anthropic's regular API price. Anthropic also lists Fast mode pricing, but this dataset excludes non-standard processing modes.
 - `Claude Sonnet 5` launched at an introductory $2/$10 per 1M input/output tokens. Anthropic made that pricing permanent on August 10, 2026, so no separate price-change point is needed.
+- `Claude Fable 5` is the only X-Large model in the current dataset and has its own series; Claude Opus remains in the Large group.
 - `GPT-5.6 Terra` and `GPT-5.6 Luna` retain their July 9 launch-price points, followed by separate July 30 price-reduction events at $2/$12 and $0.20/$1.20 per 1M input/output tokens.
 - `Claude Mythos Preview` and `Claude Mythos 5` are not represented because Anthropic restricts them to approved Project Glasswing customers. The generally available `Claude Fable 5`, which shares Mythos 5's specs and pricing, is represented instead.
 - `Gemini 3.6 Flash` is represented at its July 21, 2026 launch price of $1.50/$7.50 per 1M input/output tokens. When 3.7 Flash launched, Google also moved 3.6 Flash to the same introductory rate; that repricing is not a separate point because the 3.7 Flash point already carries the series.

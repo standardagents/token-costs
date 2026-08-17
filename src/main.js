@@ -751,7 +751,7 @@ function drawBackdrop(width, height, now) {
 }
 
 function getLayout(width, height) {
-  const compact = width < 1180 || height < 560;
+  const compact = width < 1320 || height < 560;
   const margin = compact
     ? { top: width < 720 ? 224 : 180, right: 18, bottom: 44, left: 50 }
     : { top: 152, right: 204, bottom: 84, left: 92 };
@@ -776,12 +776,7 @@ function getScales(layout) {
     .map((point) => metricValue(point))
     .filter((value) => Number.isFinite(value));
   const { min: dateMin, max: dateMax } = getVisibleDateExtent();
-  const minValue = values.length ? Math.min(...values) : 0.1;
-  const maxValue = values.length ? Math.max(...values) : 1;
-  const min = Math.max(0.005, minValue * 0.72);
-  const max = maxValue * 1.35;
-  const yMin = Math.pow(10, Math.floor(Math.log10(min)));
-  const yMax = Math.pow(10, Math.ceil(Math.log10(max)));
+  const { min: yMin, max: yMax } = pricing.getLogDomain(values);
   const dateRange = dateMax - dateMin || 1;
 
   return {
@@ -916,7 +911,8 @@ function getLabColor(lab) {
 }
 
 function getCohortColor(cohort) {
-  if (state.theme === "dark" && cohort.id === "frontier") return "#e2e8f0";
+  if (state.theme === "dark" && cohort.id === "large") return "#e2e8f0";
+  if (state.theme === "dark" && cohort.id === "xlarge") return "#fb923c";
   return cohort.color;
 }
 

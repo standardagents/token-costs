@@ -107,7 +107,7 @@ async function handleOgImage(request, env, ctx) {
   const cleanParams = normalizeAmpParams(url.searchParams);
   const view = createViewStateFromSearchParams(DATA, cleanParams);
   const params = serializeViewState(DATA, view);
-  const cacheKey = `og/v17/${await sha256(params.toString())}.png`;
+  const cacheKey = `og/v19/${await sha256(params.toString())}.png`;
   const headers = {
     "content-type": "image/png",
     "cache-control": OG_CACHE_CONTROL,
